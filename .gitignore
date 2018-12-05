@@ -1,3 +1,4 @@
 *.pt
 *.zip
 **/*.zip
+*.txt
