@@ -962,7 +962,6 @@ How many words are not there?
 
 Store the words that are not in the word vector set in the set below.
 '''
-'''
 
 # %%
 words_not_found = set()
@@ -1716,18 +1715,18 @@ class TreeLSTMCell(nn.Module):
     
     # YOUR CODE HERE
     # You only need to complete the commented lines below.
-    raise NotImplementedError("Implement this.")
+#     raise NotImplementedError("Implement this.")
 
     # The shape of each of these is [batch_size, hidden_size]
 
-    # i = ...
-    # f_l = ...    
-    # f_r = ...
-    # g = ...    
-    # o = ...
+    i = torch.sigmoid(i)
+    f_l = torch.sigmoid(f_l)
+    f_r = torch.sigmoid(f_r)
+    g = torch.tanh(g)
+    o = torch.sigmoid(o)
 
-    # c = ...
-    # h = ...
+    c = prev_c_l*f_l+prev_c_r*f_r+i*g
+    h = o*torch.tanh(c)
     
     return h, c
   
@@ -2019,6 +2018,11 @@ results = do_train(tree_model)
 
 # %%
 # plot
+acc, loss = results
+plt.plot(acc)
+
+# %%
+plt.plot(loss)
 
 # %%
 '''
