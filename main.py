@@ -21,7 +21,6 @@ We will cover the following approaches:
 - Deep continuous bag-of-words (Deep CBOW)
 - LSTM
 - TreeLSTM
-
 '''
 
 # %%
@@ -176,7 +175,6 @@ print("First train example label:",  example.label)
 #### Vocabulary 
 To work with this data we will need a vocabulary.
 The job of the vocabulary is to map each word to a unique ID.
-
 '''
 
 # %%
@@ -227,7 +225,6 @@ Let's build the token vocabulary!
 When randomly initializing word vectors, we take the words in our training
 set and assign them unique IDs, and assign all other words to <unk>, 
 because those we cannot learn a vector for based on our training data.
-
 '''
 
 # %%
@@ -456,7 +453,6 @@ def prepare_example(example, vocab):
 We will need one more thing: an evaluation metric.
 How many predictions do we get right? The accuracy will tell us.
 Make sure that you understand this code block.
-
 '''
 
 # %%
@@ -875,7 +871,7 @@ If you want to compare your results to the Stanford paper later on, then you sho
 # You only need to do this once.
 # Please comment this cell out after downloading.
 
-!wget https://gist.githubusercontent.com/bastings/b094de2813da58056a05e8e7950d4ad1/raw/3fbd3976199c2b88de2ae62afc0ecc6f15e6f7ce/glove.840B.300d.sst.txt
+# !wget https://gist.githubusercontent.com/bastings/b094de2813da58056a05e8e7950d4ad1/raw/3fbd3976199c2b88de2ae62afc0ecc6f15e6f7ce/glove.840B.300d.sst.txt
 
 # %%
 # This downloads the word2vec 300D Google News vectors 
@@ -884,7 +880,7 @@ If you want to compare your results to the Stanford paper later on, then you sho
 
 # You only need to do this once.
 # Please comment this out after downloading.
-!wget https://gist.githubusercontent.com/bastings/4d1c346c68969b95f2c34cfbc00ba0a0/raw/76b4fefc9ef635a79d0d8002522543bc53ca2683/googlenews.word2vec.300d.txt
+# !wget https://gist.githubusercontent.com/bastings/4d1c346c68969b95f2c34cfbc00ba0a0/raw/76b4fefc9ef635a79d0d8002522543bc53ca2683/googlenews.word2vec.300d.txt
 
 # %%
 # Mount Google Drive (to save the downloaded files)
@@ -896,8 +892,8 @@ drive.mount('/gdrive')
 
 # You only need to do this once.
 # Please comment this out after running it. 
-!cp "glove.840B.300d.sst.txt" "/gdrive/My Drive/"
-!cp "googlenews.word2vec.300d.txt" "/gdrive/My Drive/"
+# !cp "glove.840B.300d.sst.txt" "/gdrive/My Drive/"
+# !cp "googlenews.word2vec.300d.txt" "/gdrive/My Drive/"
 
 # %%
 # If you copied the word vectors to your Drive before,
@@ -905,7 +901,7 @@ drive.mount('/gdrive')
 
 # Copy Glove vectors *from* Google Drive
 !cp "/gdrive/My Drive/glove.840B.300d.sst.txt" .
-!cp "/gdrive/My Drive/googlenews.word2vec.300d.txt" .
+# !cp "/gdrive/My Drive/googlenews.word2vec.300d.txt" .
 
 # %%
 '''
@@ -940,7 +936,6 @@ After storing each vector in a list `vectors`, turn in into a numpy matrix like 
 ```
  
  
-
 '''
 
 # %%
@@ -948,7 +943,7 @@ After storing each vector in a list `vectors`, turn in into a numpy matrix like 
 # v = ...
 # vectors = ...
 v = Vocabulary()
-vectors = []
+vectors = [np.random.random((300,)), np.zeros((300,))]
 with open('/gdrive/My Drive/glove.840B.300d.sst.txt', 'r') as f:
   for l in f.readlines():
     w, arr_str = l.split(' ', 1)
@@ -956,6 +951,8 @@ with open('/gdrive/My Drive/glove.840B.300d.sst.txt', 'r') as f:
     vectors.append(np.fromstring(arr_str, dtype=np.float32, sep=' '))
 v.build()
 vectors = np.stack(vectors, axis=0)
+
+
 # %%
 '''
 #### Exercise: words not in our pre-trained set
@@ -964,6 +961,7 @@ How many words in the training, dev, and test set are also in your vector set?
 How many words are not there?
 
 Store the words that are not in the word vector set in the set below.
+'''
 '''
 
 # %%
@@ -975,7 +973,6 @@ words_not_found = set()
 #### Exercise: train Deep CBOW with (fixed) pre-trained embeddings
 
 Now train Deep CBOW again using the pre-trained word vectors.
-
 '''
 
 # %%
@@ -987,7 +984,7 @@ class PTDeepCBOW(DeepCBOW):
 
 # %%
 # YOUR CODE HERE
-pt_deep_cbow_model = PTDeepCBOW()
+pt_deep_cbow_model = PTDeepCBOW(len(v.w2i), embedding_dim, hidden_dim, len(t2i), vocab=v)
 
 # copy pre-trained word vectors into embeddings table
 pt_deep_cbow_model.embed.weight.data.copy_(torch.from_numpy(vectors))
@@ -1116,8 +1113,9 @@ class MyLSTMCell(nn.Module):
     input is (batch, input_size)
     hx is ((batch, hidden_size), (batch, hidden_size))
     """
+    input = input_
+    prev_h, prev_c = hx
     if not self.use_acc:
-      prev_h, prev_c = hx
       i = torch.sigmoid(input@self.w_ii+self.b_ii+prev_h@self.w_hi+self.b_hi)
       f = torch.sigmoid(input@self.w_if+self.b_if+prev_h@self.w_hf+self.b_hf)
       g = torch.tanh(input@self.w_ig+self.b_ig+prev_h@self.w_hg+self.b_hg)
@@ -1125,7 +1123,14 @@ class MyLSTMCell(nn.Module):
       c = prev_c * f + i * g
       h = o * torch.tanh(c)
     else:
-      
+      pre_act = input @ self.w_i + self.b_i + prev_h @ self.w_h + self.b_h
+      i, f, g, o = pre_act.chunk(4, 1)
+      i = torch.sigmoid(i)
+      f = torch.sigmoid(f)
+      g = torch.tanh(g)
+      o = torch.sigmoid(o)
+      c = prev_c * f + i * g
+      h = o * torch.tanh(c)
     # project input and prev state
     # YOUR CODE HERE
     
@@ -1306,15 +1311,15 @@ lstm_losses, lstm_accuracies = train_model(
 
 # %%
 # plot validation accuracy
+plt.plot(lstm_accuracies)
 
 # %%
 # plot training loss
+plt.plot(lstm_losses)
 
 # %%
 '''
 # Mini-batching
-
-
 '''
 
 # %%
@@ -1502,9 +1507,11 @@ lstm_losses, lstm_accuracies = train_model(
 
 # %%
 # plot validation accuracy
+plt.plot(lstm_accuracies)
 
 # %%
 # plot training loss
+plt.plot(lstm_losses)
 
 # %%
 '''
@@ -1532,9 +1539,6 @@ Note however that Tree LSTMs were also invented around the same time by two othe
 It is good scientific practice to cite all three papers in your report.
 
 If you study equations (9) to (14) in the paper, you will find that they are not all too different from the original LSTM that you already have.
-
-
-
 '''
 
 # %%
@@ -1542,8 +1546,6 @@ If you study equations (9) to (14) in the paper, you will find that they are not
 ## Computation
 
 Do you remember the `transitions_from_treestring` function all the way in the beginning of this lab? Every example contains a **transition sequence** made by this function. Let's look at it again:
-
-
 '''
 
 # %%
@@ -1593,19 +1595,15 @@ Now, our sentence is a (reversed) list of word embeddings.
 When we shift, we move a word embedding to the stack.
 When we reduce, we apply a Tree LSTM to the top two vectors, and the result is a single vector that we put back on the stack.
 After going through the whole transition sequence, we will have the root node on our stack! We can use that to classify the sentence.
-
-
 '''
 
 # %%
 '''
 ## Obtaining the transition sequence
-
 '''
 
 # %%
 '''
-
 So what goes on in the `transitions_from_treestring` function?
 
 The idea ([explained in this blog post](https://devblogs.nvidia.com/recursive-neural-networks-pytorch/)) is that, if we had a tree, we could traverse through the tree, and every time that we find a node containing only a word, we output a SHIFT.
@@ -1809,7 +1807,6 @@ Before passing two lists of children to the reduce layer (an instance of `TreeLS
 In the same line where we batched the children, we unbatch the output of the forward pass to become a list of states of length `L` again. We do this because we need to loop over each example's transition at the current time step and push the children that are reduced into a parent to the stack.
 
 *The batch and unbatch functions let us switch between the "PyTorch world" (Tensors) and the Python world (easy to manipulate lists).*
-
 '''
 
 # %%
