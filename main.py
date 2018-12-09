@@ -65,6 +65,7 @@ VERBOSE = False
 if not VERBOSE:
   blockPrint()
 TRAIN = False
+PLOT = False
 
 # %%
 # !wget http://nlp.stanford.edu/sentiment/trainDevTestTrees_PTB.zip
@@ -685,11 +686,13 @@ if TRAIN:
 
 # %%
 # This will plot the validation accuracies across time.
-plt.plot(bow_accuracies)
+if PLOT:
+  plt.plot(bow_accuracies)
 
 # %%
 # This will plot the training loss over time.
-plt.plot(bow_losses)
+if PLOT:
+  plt.plot(bow_losses)
 
 # %%
 '''
@@ -762,8 +765,9 @@ if TRAIN:
       cbow_model, cbow_optimizer, num_iterations=30000, 
       print_every=1000, eval_every=1000)
 
-plt.plot(cbow_accuracies)
-plt.plot(cbow_losses)
+if PLOT:
+  plt.plot(cbow_accuracies)
+  plt.plot(cbow_losses)
 
 # %%
 '''
@@ -841,11 +845,13 @@ if TRAIN:
 
 
 # %%
-plt.plot(deep_cbow_accuracies)
+if PLOT:
+  plt.plot(deep_cbow_accuracies)
 
 
 # %%
-plt.plot(deep_cbow_losses)
+if PLOT:
+  plt.plot(deep_cbow_losses)
 
 # %%
 '''
@@ -1021,10 +1027,12 @@ if TRAIN:
 
 
 # %%
-plt.plot(pt_deep_cbow_accuracies)
+if PLOT:  
+  plt.plot(pt_deep_cbow_accuracies)
 
 # %%
-plt.plot(pt_deep_cbow_losses)
+if PLOT:  
+  plt.plot(pt_deep_cbow_losses)
 
 # %%
 '''
@@ -1328,11 +1336,13 @@ if TRAIN:
 
 # %%
 # plot validation accuracy
-plt.plot(lstm_accuracies)
+if PLOT:
+  plt.plot(lstm_accuracies)
 
 # %%
 # plot training loss
-plt.plot(lstm_losses)
+if PLOT:
+  plt.plot(lstm_losses)
 
 # %%
 '''
@@ -1525,11 +1535,13 @@ if TRAIN:
 
 # %%
 # plot validation accuracy
-plt.plot(lstm_accuracies)
+if PLOT:
+  plt.plot(lstm_accuracies)
 
 # %%
 # plot training loss
-plt.plot(lstm_losses)
+if PLOT:
+  plt.plot(lstm_losses)
 
 # %%
 '''
@@ -2037,11 +2049,13 @@ if TRAIN:
 
 # %%
 # plot
-acc, loss = results
-plt.plot(acc)
+if PLOT:
+  acc, loss = results
+  plt.plot(acc)
 
 # %%
-plt.plot(loss)
+if PLOT:  
+  plt.plot(loss)
 
 # %%
 enablePrint()
