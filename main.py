@@ -678,7 +678,7 @@ print(bow_model)
 bow_model = bow_model.to(device)
 
 optimizer = optim.Adam(bow_model.parameters(), lr=0.0005)
-if not TRAIN:
+if TRAIN:
   bow_losses, bow_accuracies = train_model(
       bow_model, optimizer, num_iterations=30000, 
       print_every=1000, eval_every=1000)
@@ -757,7 +757,7 @@ print(cbow_model)
 cbow_model = cbow_model.to(device)
 
 cbow_optimizer = optim.Adam(cbow_model.parameters(), lr=0.0005)
-if not TRAIN:
+if TRAIN:
   cbow_losses, cbow_accuracies = train_model(
       cbow_model, cbow_optimizer, num_iterations=30000, 
       print_every=1000, eval_every=1000)
@@ -833,7 +833,7 @@ print(deep_cbow_model)
 deep_cbow_model = deep_cbow_model.to(device)
 
 deep_cbow_optimizer = optim.Adam(deep_cbow_model.parameters(), lr=0.0005)
-if not TRAIN:
+if TRAIN:
   deep_cbow_losses, deep_cbow_accuracies = train_model(
       deep_cbow_model, deep_cbow_optimizer, num_iterations=30000,
       print_every=1000, eval_every=1000)
@@ -1014,7 +1014,7 @@ pt_deep_cbow_model = pt_deep_cbow_model.to(device)
 # train the model
 # YOUR CODE HERE
 pt_deep_cbow_optimizer = optim.Adam(pt_deep_cbow_model.parameters(), lr=0.0005)
-if not TRAIN:
+if TRAIN:
   pt_deep_cbow_losses, pt_deep_cbow_accuracies = train_model(
       pt_deep_cbow_model, pt_deep_cbow_optimizer, num_iterations=30000,
       print_every=1000, eval_every=1000)
@@ -1321,7 +1321,7 @@ print_parameters(lstm_model)
 
 lstm_model = lstm_model.to(device)
 optimizer = optim.Adam(lstm_model.parameters(), lr=3e-4)
-if not TRAIN:
+if TRAIN:
   lstm_losses, lstm_accuracies = train_model(
       lstm_model, optimizer, num_iterations=25000, 
       print_every=250, eval_every=1000)
@@ -1514,7 +1514,7 @@ lstm_model = lstm_model.to(device)
 batch_size = 25
 optimizer = optim.Adam(lstm_model.parameters(), lr=2e-4)
 
-if not TRAIN:
+if TRAIN:
   lstm_losses, lstm_accuracies = train_model(
       lstm_model, optimizer, num_iterations=30000, 
       print_every=250, eval_every=250,
@@ -2032,7 +2032,7 @@ def do_train(model):
       eval_fn=evaluate,
       batch_fn=get_minibatch,
       batch_size=25, eval_batch_size=25)
-if not TRAIN:
+if TRAIN:
   results = do_train(tree_model)
 
 # %%
