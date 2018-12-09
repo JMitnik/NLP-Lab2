@@ -50,20 +50,7 @@ import math
 import numpy as np
 import nltk
 import matplotlib.pyplot as plt
-import sys, os
-plt.style.use('default')
 
-# Disable
-def blockPrint():
-    sys.stdout = open(os.devnull, 'w')
-
-# Restore
-def enablePrint():
-    sys.stdout = sys.__stdout__
-
-VERBOSE = False
-if not VERBOSE:
-  blockPrint()
 TRAIN = False
 PLOT = False
 
@@ -2058,7 +2045,6 @@ if PLOT:
   plt.plot(loss)
 
 # %%
-enablePrint()
 '''
 # Further experiments and report
 

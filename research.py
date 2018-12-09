@@ -9,8 +9,16 @@ import matplotlib.pyplot as plt
 import sys, os
 plt.style.use('default')
 
+# Disable
+def blockPrint():
+    sys.stdout = open(os.devnull, 'w')
+
+# Restore
+def enablePrint():
+    sys.stdout = sys.__stdout__
+
 # %%
-!wget http://nlp.stanford.edu/sentiment/trainDevTestTrees_PTB.zip
+!wget http://nlp.stanford.edu/sentiment/trainDevTestTrees_PTB.zip -O trainDevTestTrees_PTB.zip
 !unzip trainDevTestTrees_PTB.zip
 
 # %%
@@ -28,10 +36,12 @@ drive.mount('/gdrive')
 !cp "/gdrive/My Drive/glove.840B.300d.sst.txt" .
 
 # %%
-!wget https://github.com/JMitnik/NLP-Lab2/raw/cg/main.py
+!wget -q https://github.com/JMitnik/NLP-Lab2/raw/cg/main.py -O ./main.py
 
 # %%
+blockPrint()
 from main import *
+enablePrint()
 
 # %%
 results = do_train(tree_model)
