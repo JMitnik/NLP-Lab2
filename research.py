@@ -20,7 +20,7 @@ platform = '{}{}-{}'.format(get_abbr_impl(), get_impl_ver(), get_abi_tag())
 cuda_output = !ldconfig -p|grep cudart.so|sed -e 's/.*\.\([0-9]*\)\.\([0-9]*\)$/cu\1\2/'
 accelerator = cuda_output[0] if exists('/dev/nvidia0') else 'cpu'
 
-!pip install -q http://download.pytorch.org/whl/{accelerator}/torch-1.0.2-{platform}-linux_x86_64.whl torchvision
+!pip install -q http://download.pytorch.org/whl/{accelerator}/torch-1.0.0-{platform}-linux_x86_64.whl torchvision
 
 # %%
 from google.colab import drive
