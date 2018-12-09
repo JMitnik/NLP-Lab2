@@ -50,11 +50,25 @@ import math
 import numpy as np
 import nltk
 import matplotlib.pyplot as plt
+import sys, os
 plt.style.use('default')
 
+# Disable
+def blockPrint():
+    sys.stdout = open(os.devnull, 'w')
+
+# Restore
+def enablePrint():
+    sys.stdout = sys.__stdout__
+
+VERBOSE = False
+if not VERBOSE:
+  blockPrint()
+TRAIN = False
+
 # %%
-!wget http://nlp.stanford.edu/sentiment/trainDevTestTrees_PTB.zip
-!unzip trainDevTestTrees_PTB.zip
+# !wget http://nlp.stanford.edu/sentiment/trainDevTestTrees_PTB.zip
+# !unzip trainDevTestTrees_PTB.zip
 
 # %%
 # this function reads in a textfile and fixes an issue with \\
@@ -301,13 +315,13 @@ We are going to need PyTorch and Google Colab does not have it installed by defa
 
 # %%
 # http://pytorch.org/
-from os.path import exists
-from wheel.pep425tags import get_abbr_impl, get_impl_ver, get_abi_tag
-platform = '{}{}-{}'.format(get_abbr_impl(), get_impl_ver(), get_abi_tag())
-cuda_output = !ldconfig -p|grep cudart.so|sed -e 's/.*\.\([0-9]*\)\.\([0-9]*\)$/cu\1\2/'
-accelerator = cuda_output[0] if exists('/dev/nvidia0') else 'cpu'
+# from os.path import exists
+# from wheel.pep425tags import get_abbr_impl, get_impl_ver, get_abi_tag
+# platform = '{}{}-{}'.format(get_abbr_impl(), get_impl_ver(), get_abi_tag())
+# cuda_output = !ldconfig -p|grep cudart.so|sed -e 's/.*\.\([0-9]*\)\.\([0-9]*\)$/cu\1\2/'
+# accelerator = cuda_output[0] if exists('/dev/nvidia0') else 'cpu'
 
-!pip install -q http://download.pytorch.org/whl/{accelerator}/torch-0.4.1-{platform}-linux_x86_64.whl torchvision
+# !pip install -q http://download.pytorch.org/whl/{accelerator}/torch-0.4.1-{platform}-linux_x86_64.whl torchvision
 import torch
 from torch import optim
 from torch import nn
@@ -664,9 +678,10 @@ print(bow_model)
 bow_model = bow_model.to(device)
 
 optimizer = optim.Adam(bow_model.parameters(), lr=0.0005)
-bow_losses, bow_accuracies = train_model(
-    bow_model, optimizer, num_iterations=30000, 
-    print_every=1000, eval_every=1000)
+if not TRAIN:
+  bow_losses, bow_accuracies = train_model(
+      bow_model, optimizer, num_iterations=30000, 
+      print_every=1000, eval_every=1000)
 
 # %%
 # This will plot the validation accuracies across time.
@@ -742,9 +757,10 @@ print(cbow_model)
 cbow_model = cbow_model.to(device)
 
 cbow_optimizer = optim.Adam(cbow_model.parameters(), lr=0.0005)
-cbow_losses, cbow_accuracies = train_model(
-    cbow_model, cbow_optimizer, num_iterations=30000, 
-    print_every=1000, eval_every=1000)
+if not TRAIN:
+  cbow_losses, cbow_accuracies = train_model(
+      cbow_model, cbow_optimizer, num_iterations=30000, 
+      print_every=1000, eval_every=1000)
 
 plt.plot(cbow_accuracies)
 plt.plot(cbow_losses)
@@ -817,9 +833,10 @@ print(deep_cbow_model)
 deep_cbow_model = deep_cbow_model.to(device)
 
 deep_cbow_optimizer = optim.Adam(deep_cbow_model.parameters(), lr=0.0005)
-deep_cbow_losses, deep_cbow_accuracies = train_model(
-    deep_cbow_model, deep_cbow_optimizer, num_iterations=30000,
-    print_every=1000, eval_every=1000)
+if not TRAIN:
+  deep_cbow_losses, deep_cbow_accuracies = train_model(
+      deep_cbow_model, deep_cbow_optimizer, num_iterations=30000,
+      print_every=1000, eval_every=1000)
 
 
 
@@ -884,8 +901,8 @@ If you want to compare your results to the Stanford paper later on, then you sho
 
 # %%
 # Mount Google Drive (to save the downloaded files)
-from google.colab import drive
-drive.mount('/gdrive')
+# from google.colab import drive
+# drive.mount('/gdrive')
 
 # %%
 # Copy word vectors *to* Google Drive
@@ -900,7 +917,7 @@ drive.mount('/gdrive')
 # here is where you copy them back to the Colab notebook.
 
 # Copy Glove vectors *from* Google Drive
-!cp "/gdrive/My Drive/glove.840B.300d.sst.txt" .
+# !cp "/gdrive/My Drive/glove.840B.300d.sst.txt" .
 # !cp "/gdrive/My Drive/googlenews.word2vec.300d.txt" .
 
 # %%
@@ -997,9 +1014,10 @@ pt_deep_cbow_model = pt_deep_cbow_model.to(device)
 # train the model
 # YOUR CODE HERE
 pt_deep_cbow_optimizer = optim.Adam(pt_deep_cbow_model.parameters(), lr=0.0005)
-pt_deep_cbow_losses, pt_deep_cbow_accuracies = train_model(
-    pt_deep_cbow_model, pt_deep_cbow_optimizer, num_iterations=30000,
-    print_every=1000, eval_every=1000)
+if not TRAIN:
+  pt_deep_cbow_losses, pt_deep_cbow_accuracies = train_model(
+      pt_deep_cbow_model, pt_deep_cbow_optimizer, num_iterations=30000,
+      print_every=1000, eval_every=1000)
 
 
 # %%
@@ -1303,10 +1321,10 @@ print_parameters(lstm_model)
 
 lstm_model = lstm_model.to(device)
 optimizer = optim.Adam(lstm_model.parameters(), lr=3e-4)
-
-lstm_losses, lstm_accuracies = train_model(
-    lstm_model, optimizer, num_iterations=25000, 
-    print_every=250, eval_every=1000)
+if not TRAIN:
+  lstm_losses, lstm_accuracies = train_model(
+      lstm_model, optimizer, num_iterations=25000, 
+      print_every=250, eval_every=1000)
 
 # %%
 # plot validation accuracy
@@ -1496,13 +1514,14 @@ lstm_model = lstm_model.to(device)
 batch_size = 25
 optimizer = optim.Adam(lstm_model.parameters(), lr=2e-4)
 
-lstm_losses, lstm_accuracies = train_model(
-    lstm_model, optimizer, num_iterations=30000, 
-    print_every=250, eval_every=250,
-    batch_size=batch_size,
-    batch_fn=get_minibatch, 
-    prep_fn=prepare_minibatch,
-    eval_fn=evaluate)
+if not TRAIN:
+  lstm_losses, lstm_accuracies = train_model(
+      lstm_model, optimizer, num_iterations=30000, 
+      print_every=250, eval_every=250,
+      batch_size=batch_size,
+      batch_fn=get_minibatch, 
+      prep_fn=prepare_minibatch,
+      eval_fn=evaluate)
 
 # %%
 # plot validation accuracy
@@ -2013,8 +2032,8 @@ def do_train(model):
       eval_fn=evaluate,
       batch_fn=get_minibatch,
       batch_size=25, eval_batch_size=25)
-  
-results = do_train(tree_model)
+if not TRAIN:
+  results = do_train(tree_model)
 
 # %%
 # plot
@@ -2025,6 +2044,7 @@ plt.plot(acc)
 plt.plot(loss)
 
 # %%
+enablePrint()
 '''
 # Further experiments and report
 
