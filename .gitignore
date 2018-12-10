@@ -3,3 +3,4 @@
 *.zip.1
 **/*.zip
 .ipynb_checkpoints
+*.jpg

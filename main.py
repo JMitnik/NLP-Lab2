@@ -547,7 +547,7 @@ def train_model(model, optimizer, num_iterations=10000,
                 batch_fn=get_examples, 
                 prep_fn=prepare_example,
                 eval_fn=simple_evaluate,
-                batch_size=1, eval_batch_size=None, exp_name=None):
+                batch_size=1, eval_batch_size=None, exp_name=None, train_data=train_data):
   """Train a model."""  
   iter_i = 0
   train_loss = 0.
