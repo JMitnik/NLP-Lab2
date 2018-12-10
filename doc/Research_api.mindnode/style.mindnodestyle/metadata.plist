@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>author</key>
+	<string>MindNode</string>
+	<key>id</key>
+	<string>AA417EB4-52E3-4E15-84DC-6BC47E5633E6</string>
+	<key>title</key>
+	<string>Nurafsky Ch3: N-gram models</string>
+	<key>version</key>
+	<integer>3</integer>
+</dict>
+</plist>
