@@ -2,3 +2,18 @@
 *.zip
 **/*.zip
 *.txt
+
+# Latex ignores
+**/*.out
+**/*.blg
+**/*.fls
+**/*.fdb_latexmk
+**/*.bcf
+**/*.bbl
+**/*.aux
+**/*.run.xml
+**/*.synctex.gz
+**/*.log
+paper/*.pdf
+
+__latexindent_temp.tex
