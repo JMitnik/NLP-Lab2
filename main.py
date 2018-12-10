@@ -547,7 +547,7 @@ def train_model(model, optimizer, num_iterations=10000,
                 batch_fn=get_examples, 
                 prep_fn=prepare_example,
                 eval_fn=simple_evaluate,
-                batch_size=1, eval_batch_size=None):
+                batch_size=1, eval_batch_size=None, exp_name=None):
   """Train a model."""  
   iter_i = 0
   train_loss = 0.
@@ -565,6 +565,8 @@ def train_model(model, optimizer, num_iterations=10000,
   if eval_batch_size is None:
     eval_batch_size = batch_size
   
+  if exp_name is None:
+      exp_name = model.__class__.__name__
   while True:  # when we run out of examples, shuffle and continue
     for batch in batch_fn(train_data, batch_size=batch_size):
 
@@ -618,7 +620,7 @@ def train_model(model, optimizer, num_iterations=10000,
           print("new highscore")
           best_eval = accuracy
           best_iter = iter_i
-          path = "{}.pt".format(model.__class__.__name__)
+          path = "{}.pt".format(exp_name)
           ckpt = {
               "state_dict": model.state_dict(),
               "optimizer_state_dict": optimizer.state_dict(),
@@ -633,7 +635,7 @@ def train_model(model, optimizer, num_iterations=10000,
         
         # evaluate on train, dev, and test with best model
         print("Loading best model")
-        path = "{}.pt".format(model.__class__.__name__)        
+        path = "{}.pt".format(exp_name)
         ckpt = torch.load(path)
         model.load_state_dict(ckpt["state_dict"])
         
