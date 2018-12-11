@@ -12,6 +12,13 @@ from abc import ABC, abstractmethod
 plt.style.use('default')
 
 # %%
+!pip install humanize
+import psutil, humanize
+def printm():
+  process = psutil.Process(os.getpid())
+  print("Gen RAM Free:" + humanize.naturalsize( psutil.virtual_memory().available ), "| Proc size:" + humanize.naturalsize( process.memory_info().rss))
+
+# %%
 class MutePrint:
 
     def __init__(self):
@@ -48,10 +55,12 @@ drive.mount('/gdrive')
 
 # %%
 !wget -q https://github.com/JMitnik/NLP-Lab2/raw/cg/main.py -O ./main.py
+!wget -q https://github.com/JMitnik/NLP-Lab2/raw/cg/utils.py -O ./utils.py
 
 # %%
 mute.blockPrint()
 from main import *
+from utils import *
 mute.enablePrint()
 
 # %%
@@ -61,9 +70,9 @@ def get_subtree_dataset():
     args: None
     returns: a list contains three list of Examples, each of them corresponds to one of 'train', 'test', 'dev' set
     '''
-    dataset = pytreebank.load_sst("./")
+    dataset = pytreebank.load_sst("./trees")
     datasets = dataset.values()
-    print(datasets.keys())
+    print(dataset.keys())
     results = []
     for D in datasets:
         result = []
@@ -72,7 +81,7 @@ def get_subtree_dataset():
             for c in tree.all_children():
                 sc = str(c)
                 trans = transitions_from_treestring(sc)
-                label = self.label
+                label = c.label
                 tree = c
                 tokens = tokens_from_treestring(sc)
                 result.append(Example(tokens=tokens, tree=tree, label=label, transitions=trans))
@@ -80,9 +89,7 @@ def get_subtree_dataset():
     return results
 
 # %%
-subtree_train_data, subtree_dev_data, subtree_test_data = get_subtree_dataset()
-
-# %%
+subtree_train_data, subtree_test_data, subtree_dev_data = get_subtree_dataset()
 
 # %%
 class Experiment():
@@ -93,12 +100,12 @@ class Experiment():
         self.model = model
         self.optimizer = optimizer
     def train(self):
-        path = "{}.pt".format(kwargs['exp_name'] if 'exp_name' in kwargs or self.model.__class__.__name__)
+        path = "{}.pt".format(self.kwargs['exp_name'] if 'exp_name' in self.kwargs else self.model.__class__.__name__)
         if os.path.exists(path):
             ckpt= torch.load(path)
             self.model.load_state_dict(ckpt["state_dict"])
             return
-        self.losses, self.accs = train_model(*self.args, **self.kwargs)
+        self.losses, self.accs = train_model(self.model, self.optimizer, *self.args, **self.kwargs)
     def eval(self, eval_fn=None, data=test_data, **kwargs):
         if eval_fn is None:
             if not ('eval_fn' in kwargs):
@@ -117,9 +124,8 @@ class Experiment():
     def get_losses():
         return self.losses
 
-    results = do_train(tree_model)
-    acc, loss = results
-    plt.plot(acc)
+
+
 # %%
 def prepare_subtreelstm_minibatch(mb, vocab):
   """
@@ -146,6 +152,8 @@ def prepare_subtreelstm_minibatch(mb, vocab):
   transitions = transitions.T  # time-major
   
   return (x, transitions), y
+
+
 # %%
 # build all the experiments by feeding corresponding parameters
 # cant think of cleaner way to do it :(
@@ -184,9 +192,13 @@ with torch.no_grad():
 optimizer = optim.Adam(sub_tree_model.parameters(), lr=2e-4)
 sub_tree_lstm_exp = Experiment(sub_tree_model, optimizer, num_iterations=30000,
                            print_every=250, eval_every=250,
-                           prep_fn=prepare_treelstm_minibatch,
+                           prep_fn=prepare_subtreelstm_minibatch,
                            eval_fn=evaluate,
                            batch_fn=get_minibatch,
                            batch_size=25, eval_batch_size=25, exp_name='subtree_lstm', train_data=subtree_train_data)
+
+
 # %%
-plt.plot(loss)
+sub_tree_lstm_exp.train()
+
+# %%
