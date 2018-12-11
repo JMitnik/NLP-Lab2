@@ -1,0 +1,43 @@
+\section{Introduction}
+% Pages-size: 1
+\label{sec: intro}
+Sentiment analysis is a sub-domain within the field of Natural Language Processing, 
+in which an statistical model infers the direction and magnitude of emotions
+from certain corpora. Language representation plays an important role in 
+the sentiment inference of unseen text. Successful inference depends on deciding 
+appropriate language models which can model the structural dependencies within
+the sentences of a language sufficiently. One such structural dependency is word order. Another
+complicated aspect of inference is sufficient context when presented with data 
+to predict or train on: for instance, if the model has been trained on partial phrases, 
+it might become easier for the model to make wrong inferences based on 
+non-negated sentiments. For this reason, it is the goal of this paper to investigate
+the role of these dependencies.
+
+This paper will attempt to answer some of the questions corresponding to the data
+by examining a number of different research questions.
+
+\begin{enumerate}
+    \item \textbf{How important is word order for the task of classification of 
+    sentiment?} Some models, such as the traditional Bag of Words, disregard word order in favour
+    of a simpler vector representation of the underlying text. Long short-term memory 
+    (LSTM), a more recent variant on the Recurrent Neural Network, 
+    maintains a memory state of the current words encountered to incorporate 
+    word-order. This paper initially believes that models which maintain and 
+    understand word-order will perform better 
+    % TODO: Do something about the findings
+    \item \textbf{Does tree structure improve the accuracy as opposed to sequential
+    learning?} The main hypothesis is that the difference will be significant
+    in favour for tree structure, as it allows for more encorporation of prior
+    contexts. In our end results, we confirm that the results seem to indicate
+    a significant improvement.
+    % TODO: Add more here?
+    \item \textbf{Performance on supervising sentiment per node?}
+    During training, the model can learn to learn sentiment according to an entire
+    sentence, or more granular, to learn the sentiments of the words themselves.
+    While this enables the model to take more data into account, it also does not
+    take into account the effects of negation and magnifying words. The paper
+    thus believes that the model might perform less accurately because of that.
+    % TODO: Add findings
+    \item \textbf{Does decreasing sentence lengths help the model predict better?}
+    The model could in theory perform
+\end{enumerate}
