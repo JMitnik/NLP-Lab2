@@ -157,48 +157,56 @@ def prepare_subtreelstm_minibatch(mb, vocab):
 # %%
 # build all the experiments by feeding corresponding parameters
 # cant think of cleaner way to do it :(
+
+name2class = {'bow': BOW, 'cbow': CBOW, 'deep_cbow': DeepCBOW, 'lstm': LSTMClassifier,
+              'tree_lstm': TreeLSTMClassifier, 'subtree_lstm': TreeLSTMClassifier}
+name2lr = {'bow': 5e-4, 'cbow': 5e-4, 'deep_cbow': 5e-4,
+           'lstm': 3e-4, 'tree_lstm': 2e-4, 'subtree_lstm':2e-4}
 xargs_bow = dict(num_iterations=30000, print_every=1000, eval_every=1000)
-optimizer = optim.Adam(bow_model.parameters(), lr=0.0005)
-bow_exp = Experiment(bow_model, optimizer, **xargs_bow)
+xargs_lstm = dict(num_iterations=25000, print_every=250, eval_every=1000)
+xargs_tree_lstm = dict(num_iterations=30000,
+                       print_every=250, eval_every=250,
+                       prep_fn=prepare_treelstm_minibatch,
+                       eval_fn=evaluate,
+                       batch_fn=get_minibatch,
+                       batch_size=25, eval_batch_size=25)
+xargs_subtree_lstm = dict(num_iterations=30000,
+                          print_every=250, eval_every=250,
+                          prep_fn=prepare_subtreelstm_minibatch,
+                          eval_fn=evaluate,
+                          batch_fn=get_minibatch,
+                          batch_size=25, eval_batch_size=25, train_data=subtree_train_data)
+name2xargs = {'bow': xargs_bow, 'cbow': xargs_bow, 'deep_cbow': xargs_bow,
+              'lstm': xargs_lstm, 'tree_lstm': xargs_tree_lstm, 'subtree_lstm': xargs_subtree_lstm}
 
-optimizer = optim.Adam(cbow_model.parameters(), lr=0.0005)
-cbow_exp = Experiment(cbow_model, optimizer, **xargs_bow)
+bow_p = [vocab_size, n_classes, v]
+cbow_p = [len(v.w2i), embedding_dim, len(t2i), v]
+deep_cbow_p = [len(v.w2i), embedding_dim, hidden_dim, len(t2i), v]
+lstm_p = [len(v.w2i), 300, 168, len(t2i), v]
+tree_lstm_p = [len(v.w2i), 300, 150, len(t2i), v]
+name2model_p = {'bow': bow_p, 'cbow': cbow_p, 'deep_cbow': deep_cbow_p,
+                'lstm': lstm_p, 'tree_lstm': tree_lstm_p, 'subtree_lstm': tree_lstm_p}
 
-optimizer = optim.Adam(deep_cbow_model.parameters(), lr=0.0005)
-deep_cbow_exp = Experiment(deep_cbow_model, optimizer, **xargs_bow)
-
-optimizer = optim.Adam(pt_deep_cbow_model.parameters(), lr=0.0005)
-deep_cbow_exp = Experiment(pt_deep_cbow_model, optimizer, num_iterations=30000,
-      print_every=1000, eval_every=1000)
-
-optimizer = optim.Adam(lstm_model.parameters(), lr=3e-4)
-lstm_exp = Experiment(lstm_model, optimizer, num_iterations=25000, print_every=250, eval_every=1000)
-
-optimizer = optim.Adam(tree_model.parameters(), lr=2e-4)
-tree_lstm_exp = Experiment(tree_model, optimizer, num_iterations=30000, 
-      print_every=250, eval_every=250,
-      prep_fn=prepare_treelstm_minibatch,
-      eval_fn=evaluate,
-      batch_fn=get_minibatch,
-      batch_size=25, eval_batch_size=25)
-
-# build a new tree lstm for feeding subtree
-sub_tree_model = TreeLSTMClassifier(
-    len(v.w2i), 300, 150, len(t2i), v)
-
-with torch.no_grad():
-  sub_tree_model.embed.weight.data.copy_(torch.from_numpy(vectors))
-  sub_tree_model.embed.weight.requires_grad = False
-optimizer = optim.Adam(sub_tree_model.parameters(), lr=2e-4)
-sub_tree_lstm_exp = Experiment(sub_tree_model, optimizer, num_iterations=30000,
-                           print_every=250, eval_every=250,
-                           prep_fn=prepare_subtreelstm_minibatch,
-                           eval_fn=evaluate,
-                           batch_fn=get_minibatch,
-                           batch_size=25, eval_batch_size=25, exp_name='subtree_lstm', train_data=subtree_train_data)
-
+def do_experiment(rd_seed, exp_name_li=list(name2class.keys())):
+    torch.cuda.manual_seed(rd_seed)
+    np.random.seed(rd_seed)
+    for n in exp_name_li:
+        optimizer = optim.Adam(bow_model.parameters(), lr=name2lr[n])
+        # build a new tree lstm for feeding subtree
+        model = name2class[n](*name2model_p[n])
+        model = model.to(device)
+        if n.startswith('pt') or n.endswith('lstm'):
+            with torch.no_grad():
+                model.embed.weight.data.copy_(torch.from_numpy(vectors))
+                model.embed.weight.requires_grad = False
+        exp = Experiment(model, optimizer, exp_name='{}_rd_seed_{}'.format(n, rd_seed), **name2xargs[n])
+        exp.train()
+        yield exp
 
 # %%
-sub_tree_lstm_exp.train()
+rd_s_li = [7, 42, 1984]
+exp_li = []
+for rs_s in rd_s_li:
+    exp_li.append(list(do_experiment(rs_s)))
 
 # %%
