@@ -113,13 +113,15 @@ class Experiment():
             if not ('eval_fn' in kwargs):
                 eval_fn = simple_evaluate
             else:
-                eval_fn = self.kwargs['eval_fn'] 
-        return eval_fn(self.model, data, **kwargs)
+                eval_fn = self.kwargs['eval_fn']
+        self.pred, _, _, self.acc = eval_fn(self.model, data, **kwargs)
+        return 
 
     def plot(self):
         plt.plot(self.losses)
         plt.plot(self.accs)
         return
+
     def get_accuracy():
         return self.accs
 
@@ -128,33 +130,6 @@ class Experiment():
 
 
 
-# %%
-def prepare_subtreelstm_minibatch(mb, vocab):
-  """
-  Returns sentences reversed (last word first)
-  Returns transitions together with the sentences.  
-  """
-  batch_size = len(mb)
-  maxlen = max([len(ex.tokens) for ex in mb])
-    
-  # vocab returns 0 if the word is not there
-  # NOTE: reversed sequence!
-  x = [pad([vocab.w2i.get(t, 0) for t in ex.tokens], maxlen)[::-1] for ex in mb]
-  
-  x = torch.LongTensor(x)
-  x = x.to(device)
-  
-  y = [ex.label for ex in mb]
-  y = torch.LongTensor(y)
-  y = y.to(device)
-  
-  maxlen_t = max([len(ex.transitions) for ex in mb])
-  transitions = [pad(ex.transitions, maxlen_t, pad_value=2) for ex in mb]
-  transitions = np.array(transitions)
-  transitions = transitions.T  # time-major
-  
-  return (x, transitions), y
-
 
 # %%
 # build all the experiments by feeding corresponding parameters
@@ -162,6 +137,7 @@ def prepare_subtreelstm_minibatch(mb, vocab):
 
 name2class = {'bow': BOW, 'cbow': CBOW, 'deep_cbow': DeepCBOW, 'pt_deep_cbow': DeepCBOW, 'lstm': LSTMClassifier, 'mini_lstm': LSTMClassifier,
               'tree_lstm': TreeLSTMClassifier, 'subtree_lstm': TreeLSTMClassifier}
+model_name_li = list(name2class.keys())
 name2lr = {'bow': 5e-4, 'cbow': 5e-4, 'deep_cbow': 5e-4, 'pt_deep_cbow': 5e-4,
            'lstm': 3e-4, 'mini_lstm':2e-4, 'tree_lstm': 2e-4, 'subtree_lstm': 2e-4}
 xargs_bow = dict(num_iterations=30000, print_every=1000, eval_every=1000)
@@ -180,7 +156,7 @@ xargs_tree_lstm = dict(num_iterations=30000,
                        batch_size=25, eval_batch_size=25)
 xargs_subtree_lstm = dict(num_iterations=30000,
                           print_every=250, eval_every=250,
-                          prep_fn=prepare_subtreelstm_minibatch,
+                          prep_fn=prepare_treelstm_minibatch,
                           eval_fn=evaluate,
                           batch_fn=get_minibatch,
                           batch_size=25, eval_batch_size=25, train_data=subtree_train_data)
@@ -225,4 +201,47 @@ for rs_s in rd_s_li:
 !cp ./*.pt "/gdrive/My Drive/pts"
 
 # %%
+!pip install prettytable
+import prettytable as pt
 
+# %%
+
+def generate_tables():
+    models_eval_results = {}
+    for rd, el in zip(rd_s_li, *exp_li):
+        for n, exp in zip(model_name_li, el):
+            prep_func = prepare_treelstm_minibatch if n.startswith(
+                'tree') or n.startswith('subtree') else prepare_minibatch
+            exp.eval(eval_fn=evaluate_with_results, batch_fn=get_minibatch,
+                    prep_fn=prep_func)
+            pred_and_acc = [exp.pred, exp.acc]
+            models_eval_results[n] = [pred_and_acc] if not models_eval_results.get(
+                n) else models_eval_results[n].append([pred_and_acc])
+    acc_table = pt.PrettyTable()
+    acc_table.field_names = model_name_li
+    def helper(x):
+        y = [e[1] for e in x]
+        m = np.mean(y)
+        v = np.std(y)
+        s = '{}+-{}'.format(m, v)
+        return s
+    acc_table.add_row([helper(models_eval_results[n]) for n in model_name_li])
+    sig_table = pt.PrettyTable()
+    sig_table.field_names = ['models']+model_name_li
+    for n1 in model_name_li:
+        row = [n1]
+        for n2 in model_name_li:
+            sig = sign_test(models_eval_results[n1][0][0], models_eval_results[n2][0][0])
+            row.append(sig)
+        sig_table.add_row(row)
+    return acc_table, sig_table
+
+# %%
+
+acc_table, sig_table = generate_tables()
+
+# %%
+print(acc_table)
+
+# %%
+print(sig_table)

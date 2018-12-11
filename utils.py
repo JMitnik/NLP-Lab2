@@ -1,6 +1,7 @@
 from decimal import *
 import scipy
 import math
+import torch
 
 def sign_test(results_1, results_2):
   """test for significance
@@ -31,3 +32,25 @@ def sign_test(results_1, results_2):
   summation *= (Decimal(q)**Decimal(n))
 
   return summation
+
+def evaluate_with_results(model, data, 
+             batch_fn, prep_fn,
+             batch_size=16):
+  """Accuracy of a model on given data set (using minibatches)"""
+  correct = 0
+  total = 0
+  model.eval()  # disable dropout
+  pred = []
+  for mb in batch_fn(data, batch_size=batch_size, shuffle=False):
+    x, targets = prep_fn(mb, model.vocab)
+    with torch.no_grad():
+      logits = model(x)
+      
+    predictions = logits.argmax(dim=-1).view(-1)
+    pred.append(predictions)
+    # add the number of correct predictions to the total correct
+    correct += (predictions == targets.view(-1)).sum().item()
+    total += targets.size(0)
+  pred = torch.cat(pred, 0)
+  return pred, correct, total, correct / float(total)
+
