@@ -954,14 +954,14 @@ After storing each vector in a list `vectors`, turn in into a numpy matrix like 
 # YOUR CODE HERE
 # v = ...
 # vectors = ...
-v = Vocabulary()
+nv = Vocabulary()
 vectors = [np.random.random((300,)), np.zeros((300,))]
 with open('/gdrive/My Drive/glove.840B.300d.sst.txt', 'r') as f:
   for l in f.readlines():
     w, arr_str = l.split(' ', 1)
-    v.count_token(w)
+    nv.count_token(w)
     vectors.append(np.fromstring(arr_str, dtype=np.float32, sep=' '))
-v.build()
+nv.build()
 vectors = np.stack(vectors, axis=0)
 
 
@@ -995,7 +995,8 @@ class PTDeepCBOW(DeepCBOW):
 
 # %%
 # YOUR CODE HERE
-pt_deep_cbow_model = PTDeepCBOW(len(v.w2i), embedding_dim, hidden_dim, len(t2i), vocab=v)
+pt_deep_cbow_model = PTDeepCBOW(
+    len(nv.w2i), embedding_dim, hidden_dim, len(t2i), vocab=nv)
 
 # copy pre-trained word vectors into embeddings table
 pt_deep_cbow_model.embed.weight.data.copy_(torch.from_numpy(vectors))
@@ -1306,7 +1307,7 @@ These formulas simply mean that we *drop* certain parameters during training (by
 '''
 
 # %%
-lstm_model = LSTMClassifier(len(v.w2i), 300, 168, len(t2i), v)
+lstm_model = LSTMClassifier(len(nv.w2i), 300, 168, len(t2i), nv)
 
 # copy pre-trained word vectors into embeddings table
 with torch.no_grad():
@@ -1453,7 +1454,7 @@ for ex in mb:
 
 # %%
 # We should find 1s at the end where padding is.
-x, y = prepare_minibatch(mb, v)
+x, y = prepare_minibatch(mb, nv)
 print("x", x)
 print("y", y)
 
@@ -1498,7 +1499,7 @@ With this, let's run the LSTM again but now using minibatches!
 
 # %%
 lstm_model = LSTMClassifier(
-    len(v.w2i), 300, 168, len(t2i), v)
+    len(nv.w2i), 300, 168, len(t2i), nv)
 
 # copy pre-trained vectors into embeddings table
 with torch.no_grad():
@@ -2011,7 +2012,7 @@ def prepare_treelstm_minibatch(mb, vocab):
 # Now let's train the Tree LSTM!
 
 tree_model = TreeLSTMClassifier(
-    len(v.w2i), 300, 150, len(t2i), v)
+    len(nv.w2i), 300, 150, len(t2i), nv)
 
 with torch.no_grad():
   tree_model.embed.weight.data.copy_(torch.from_numpy(vectors))
