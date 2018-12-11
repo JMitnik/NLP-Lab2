@@ -161,7 +161,7 @@ def prepare_subtreelstm_minibatch(mb, vocab):
 name2class = {'bow': BOW, 'cbow': CBOW, 'deep_cbow': DeepCBOW, 'pt_deep_cbow': DeepCBOW, 'lstm': LSTMClassifier,
               'tree_lstm': TreeLSTMClassifier, 'subtree_lstm': TreeLSTMClassifier}
 name2lr = {'bow': 5e-4, 'cbow': 5e-4, 'deep_cbow': 5e-4, 'pt_deep_cbow': 5e-4,
-           'lstm': 3e-4, 'tree_lstm': 2e-4, 'subtree_lstm':2e-4}
+           'lstm': 3e-4, 'tree_lstm': 2e-4, 'subtree_lstm': 2e-4}
 xargs_bow = dict(num_iterations=30000, print_every=1000, eval_every=1000)
 xargs_lstm = dict(num_iterations=25000, print_every=250, eval_every=1000)
 xargs_tree_lstm = dict(num_iterations=30000,
@@ -182,25 +182,27 @@ name2xargs = {'bow': xargs_bow, 'cbow': xargs_bow, 'deep_cbow': xargs_bow, 'pt_d
 bow_p = [vocab_size, n_classes, v]
 cbow_p = [len(v.w2i), embedding_dim, len(t2i), v]
 deep_cbow_p = [len(v.w2i), embedding_dim, hidden_dim, len(t2i), v]
-pt_deep_cbow_p = [len(v.w2i), embedding_dim, hidden_dim, len(t2i), nv]
-lstm_p = [len(v.w2i), 300, 168, len(t2i), nv]
-tree_lstm_p = [len(v.w2i), 300, 150, len(t2i), nv]
+pt_deep_cbow_p = [len(nv.w2i), embedding_dim, hidden_dim, len(t2i), nv]
+lstm_p = [len(nv.w2i), 300, 168, len(t2i), nv]
+tree_lstm_p = [len(nv.w2i), 300, 150, len(t2i), nv]
 name2model_p = {'bow': bow_p, 'cbow': cbow_p, 'deep_cbow': deep_cbow_p, 'pt_deep_cbow': pt_deep_cbow_p,
                 'lstm': lstm_p, 'tree_lstm': tree_lstm_p, 'subtree_lstm': tree_lstm_p}
+
 
 def do_experiment(rd_seed, exp_name_li=list(name2class.keys())):
     torch.cuda.manual_seed(rd_seed)
     np.random.seed(rd_seed)
     for n in exp_name_li:
-        optimizer = optim.Adam(bow_model.parameters(), lr=name2lr[n])
         # build a new tree lstm for feeding subtree
         model = name2class[n](*name2model_p[n])
         model = model.to(device)
+        optimizer = optim.Adam(model.parameters(), lr=name2lr[n])
         if n.startswith('pt') or n.endswith('lstm'):
             with torch.no_grad():
                 model.embed.weight.data.copy_(torch.from_numpy(vectors))
                 model.embed.weight.requires_grad = False
-        exp = Experiment(model, optimizer, exp_name='{}_rd_seed_{}'.format(n, rd_seed), **name2xargs[n])
+        exp = Experiment(model, optimizer, exp_name='{}_rd_seed_{}'.format(
+            n, rd_seed), **name2xargs[n])
         exp.train()
         yield exp
 
