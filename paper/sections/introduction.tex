@@ -1,43 +1,63 @@
 \section{Introduction}
 % Pages-size: 1
 \label{sec: intro}
-Sentiment analysis is a sub-domain within the field of Natural Language Processing, 
-in which an statistical model infers the direction and magnitude of emotions
-from certain corpora. Language representation plays an important role in 
-the sentiment inference of unseen text. Successful inference depends on deciding 
-appropriate language models which can model the structural dependencies within
-the sentences of a language sufficiently. One such structural dependency is word order. Another
-complicated aspect of inference is sufficient context when presented with data 
-to predict or train on: for instance, if the model has been trained on partial phrases, 
-it might become easier for the model to make wrong inferences based on 
-non-negated sentiments. For this reason, it is the goal of this paper to investigate
-the role of these dependencies.
+Sentiment analysis is a sub-domain within the field of Natural Language
+Processing, in which an statistical model infers the direction and magnitude of
+emotions from certain corpora. Language representation plays an important role
+in the sentiment inference of unseen text. Successful inference depends on
+deciding appropriate language models which can model the structural dependencies
+within the sentences of a language sufficiently. One such structural dependency
+is word order. Another complicated aspect of inference is sufficient context
+when presented with data to predict or train on: for instance, if the model has
+been trained on partial phrases, it might become easier for the model to make
+wrong inferences based on non-negated sentiments. For this reason, it is the
+goal of this paper to investigate the role of these dependencies.
 
-This paper will attempt to answer some of the questions corresponding to the data
-by examining a number of different research questions.
-
+This paper will attempt to answer some of the questions corresponding to the
+[data by examining a number of different research questions.]
+% TODO: Reflow the bracketed text
 \begin{enumerate}
-    \item \textbf{How important is word order for the task of classification of 
-    sentiment?} Some models, such as the traditional Bag of Words, disregard word order in favour
-    of a simpler vector representation of the underlying text. Long short-term memory 
-    (LSTM), a more recent variant on the Recurrent Neural Network, 
-    maintains a memory state of the current words encountered to incorporate 
-    word-order. This paper initially believes that models which maintain and 
-    understand word-order will perform better 
+    \item \textbf{How important is word order for the task of classification of
+    sentiment?} Some models, such as the traditional Bag of Words, disregard
+    word order in favour of a simpler vector representation of the underlying
+    text. Long short-term memory (LSTM), a more recent variant on the Recurrent
+    Neural Network, maintains a memory state of recent words encountered to
+    incorporate word-order of short and long distances. This paper initially
+    believes that models which maintain and understand word-order will perform
+    better. 
     % TODO: Do something about the findings
-    \item \textbf{Does tree structure improve the accuracy as opposed to sequential
-    learning?} The main hypothesis is that the difference will be significant
-    in favour for tree structure, as it allows for more encorporation of prior
-    contexts. In our end results, we confirm that the results seem to indicate
-    a significant improvement.
-    % TODO: Add more here?
+    \item \textbf{Does tree structure improve the accuracy as opposed to
+    sequential learning?} Vanilla LSTM as originally introduced, behaves in a
+    sequential manner. One alternative to LSTM proposed was Tree LSTM, which can
+    use multiple prior cells to infer the state of the current word, [enhancing
+    the context available for the model]. The paper seeks to investigate whether
+    adding these additional precursor cells for each prediction, will actually
+    increase performance of the inference on the testing. The original belief is
+    that this will certainly be the case, and as the results suggest, this
+    [seems to be case].
+    % TODO: Add cite for sequential introduction TODO: Add cite for tree
+    % introduction TODO: Reflow bracketed text. TODO: Is this significant?
     \item \textbf{Performance on supervising sentiment per node?}
-    During training, the model can learn to learn sentiment according to an entire
-    sentence, or more granular, to learn the sentiments of the words themselves.
-    While this enables the model to take more data into account, it also does not
-    take into account the effects of negation and magnifying words. The paper
-    thus believes that the model might perform less accurately because of that.
-    % TODO: Add findings
+    This paper is seeking to investigate if the Tree LSTM algorithm should be
+    trained on the supervision of the sentiment of individual words, or on the
+    sentiment of the sentences altogether. The initial hypothesis of this paper
+    argues that the supervision of individual nodes might decrease performance,
+    due to less context to account for negating sentiment, for instance.
+    % TODO: @Gongze, do you agree with the above initial hypothesis and
+    % reasoning? TODO: Incorporate later results.
     \item \textbf{Does decreasing sentence lengths help the model predict better?}
-    The model could in theory perform
+    A model's performance might depend on how many words the model needs to keep
+    in store. Decreasing the sentence length might show the difference in model
+    performance, and which model relatively performs better with longer
+    sentences. Initially, this paper argues that Tree LSTM might perform the
+    best, as it has more cells to infer relevant knowledge from than regular
+    LSTM. 
+    % TODO: @Gongze, do you agree with the initial hypothesis? TODO: Add results
+
 \end{enumerate}
+
+% TODO: Add citation for Glove
+In order to do so, the different models mentioned will be initialized with
+300-dimensional Glove vectors. The goal is to predict the sentiment of [Stanford
+Sentiment Treebank data], with the different settings corresponding to the [aforementioned
+research questions].
