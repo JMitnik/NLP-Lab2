@@ -128,68 +128,82 @@ class Experiment():
     def get_losses():
         return self.losses
 
-
-
-
 # %%
 # build all the experiments by feeding corresponding parameters
 # cant think of cleaner way to do it :(
+from collections import namedtuple
+ExperimentModel = namedtuple("ExperimentModel", ["name", "modelclass" ,"lr", "options", "parameters"])
 
-name2class = {'bow': BOW, 'cbow': CBOW, 'deep_cbow': DeepCBOW, 'pt_deep_cbow': DeepCBOW, 'lstm': LSTMClassifier, 'mini_lstm': LSTMClassifier,
-              'tree_lstm': TreeLSTMClassifier, 'subtree_lstm': TreeLSTMClassifier}
-model_name_li = list(name2class.keys())
-name2lr = {'bow': 5e-4, 'cbow': 5e-4, 'deep_cbow': 5e-4, 'pt_deep_cbow': 5e-4,
-           'lstm': 3e-4, 'mini_lstm':2e-4, 'tree_lstm': 2e-4, 'subtree_lstm': 2e-4}
-xargs_bow = dict(num_iterations=30000, print_every=1000, eval_every=1000)
-xargs_lstm = dict(num_iterations=25000, print_every=250, eval_every=1000)
-xargs_mini_lstm = dict(num_iterations=30000,
-                  print_every=250, eval_every=250,
-                  batch_size=batch_size,
-                  batch_fn=get_minibatch,
-                  prep_fn=prepare_minibatch,
-                  eval_fn=evaluate)
-xargs_tree_lstm = dict(num_iterations=30000,
-                       print_every=250, eval_every=250,
-                       prep_fn=prepare_treelstm_minibatch,
-                       eval_fn=evaluate,
-                       batch_fn=get_minibatch,
-                       batch_size=25, eval_batch_size=25)
-xargs_subtree_lstm = dict(num_iterations=30000,
-                          print_every=250, eval_every=250,
-                          prep_fn=prepare_treelstm_minibatch,
-                          eval_fn=evaluate,
-                          batch_fn=get_minibatch,
-                          batch_size=25, eval_batch_size=25, train_data=subtree_train_data)
-name2xargs = {'bow': xargs_bow, 'cbow': xargs_bow, 'deep_cbow': xargs_bow, 'pt_deep_cbow': xargs_bow,
-              'lstm': xargs_lstm, 'mini_lstm': xargs_mini_lstm, 'tree_lstm': xargs_tree_lstm, 'subtree_lstm': xargs_subtree_lstm}
-
-bow_p = [vocab_size, n_classes, v]
-cbow_p = [len(v.w2i), embedding_dim, len(t2i), v]
-deep_cbow_p = [len(v.w2i), embedding_dim, hidden_dim, len(t2i), v]
-pt_deep_cbow_p = [len(nv.w2i), embedding_dim, hidden_dim, len(t2i), nv]
-lstm_p = [len(nv.w2i), 300, 168, len(t2i), nv]
-tree_lstm_p = [len(nv.w2i), 300, 150, len(t2i), nv]
-name2model_p = {'bow': bow_p, 'cbow': cbow_p, 'deep_cbow': deep_cbow_p, 'pt_deep_cbow': pt_deep_cbow_p,
-                'lstm': lstm_p, 'mini_lstm':lstm_p, 'tree_lstm': tree_lstm_p, 'subtree_lstm': tree_lstm_p}
-
+models = [
+#     ExperimentModel("bow", BOW, 5e-4,
+#         dict(num_iterations=30000, print_every=1000, eval_every=1000),
+#         [vocab_size, n_classes, v]
+#     ),
+#     ExperimentModel("cbow", CBOW, 5e-4, 
+#         dict(num_iterations=30000, print_every=1000, eval_every=1000),
+#         [len(v.w2i), embedding_dim, len(t2i), v]
+#     ),
+#     ExperimentModel("deep_cbow", DeepCBOW, 5e-4,
+#         dict(num_iterations=30000, print_every=1000, eval_every=1000),
+#         [len(v.w2i), embedding_dim, hidden_dim, len(t2i), v]
+#    ),
+#     ExperimentModel("pt_deep_cbow", DeepCBOW, 5e-4,
+#         dict(num_iterations=30000, print_every=1000, eval_every=1000),
+#         [len(nv.w2i), embedding_dim, hidden_dim, len(t2i), nv]
+#    ),
+#     ExperimentModel("lstm", LSTMClassifier, 3e-4,
+#         dict(num_iterations=25000, print_every=250, eval_every=1000),
+#         [len(nv.w2i), 300, 168, len(t2i), nv]
+#    ),
+#     ExperimentModel("mini_lstm", LSTMClassifier, 2e-4,
+#         dict(num_iterations=30000,
+#                   print_every=250, eval_every=250,
+#                   batch_size=batch_size,
+#                   batch_fn=get_minibatch,
+#                   prep_fn=prepare_minibatch,
+#                   eval_fn=evaluate
+#         ),
+#         [len(nv.w2i), 300, 168, len(t2i), nv]
+#     ),
+    ExperimentModel("tree_lstm", TreeLSTMClassifier, 2e-4,
+       dict(num_iterations=30000,
+           print_every=250, eval_every=250,
+           prep_fn=prepare_treelstm_minibatch,
+           eval_fn=evaluate,
+           batch_fn=get_minibatch,
+           batch_size=25, eval_batch_size=25),
+        [len(nv.w2i), 300, 150, len(t2i), nv]
+   )
+#     ExperimentModel("subtree_lstm", TreeLSTMClassifier, 2e-4,
+#        dict(num_iterations=30000,
+#               print_every=250, eval_every=250,
+#               prep_fn=prepare_treelstm_minibatch,
+#               eval_fn=evaluate,
+#               batch_fn=get_minibatch,
+#               batch_size=25, eval_batch_size=25, train_data=subtree_train_data),
+#         [len(nv.w2i), 300, 150, len(t2i), nv]
+#    )
+]
 !cp /gdrive/My\ Drive/pts/*.pt ./
 
-def do_experiment(rd_seed, exp_name_li=list(name2class.keys()), train_embed=False):
+def do_experiment(rd_seed, experiment_models, train_embed=False):
     torch.cuda.manual_seed(rd_seed)
     np.random.seed(rd_seed)
-    for n in exp_name_li:
+    for exp_model in experiment_models:
         # build a new tree lstm for feeding subtree
-        model = name2class[n](*name2model_p[n])
+        model = exp_model.modelclass(exp_model.parameters)
         model = model.to(device)
-        optimizer = optim.Adam(model.parameters(), lr=name2lr[n])
-        if n.startswith('pt') or n.endswith('lstm'):
+        optimizer = optim.Adam(model.parameters(), lr=exp_model.lr)
+        if exp_model.name.startswith('pt') or exp_model.name.endswith('lstm'):
             with torch.no_grad():
                 model.embed.weight.data.copy_(torch.from_numpy(vectors))
 
                 if not train_embed:
                     model.embed.weight.requires_grad = False
-        exp = Experiment(model, optimizer, exp_name='{}_rd_seed_{}'.format(
-            n, rd_seed), **name2xargs[n])
+        
+        path_embed_string = "train_embed" if train_embed else "not_train_embed"
+        exp = Experiment(model, optimizer, exp_name='{}_rd_seed_{}_{}'.format(
+            n, rd_seed, path_embed_string), **exp_model.options)
         exp.train()
         yield exp
 
@@ -206,6 +220,7 @@ for rs_s in rd_s_li:
 # %%
 !pip install prettytable
 import prettytable as pt
+
 
 # %%
 
@@ -248,3 +263,41 @@ print(acc_table)
 
 # %%
 print(sig_table)
+
+#%%
+from itertools import groupby
+
+def prep_bin(data, bin_size):
+    """ Returns a bin """
+    max_line_length = max([len(example.tokens) for example in data])
+    sorted_data = sorted(data, key=lambda x: len(x.tokens))
+    bins = []
+    
+    for key, group in groupby(sorted_data, lambda x: len(x.tokens)):
+        bins.append(list(group))
+        
+    return bins
+
+# %%
+def sent_len_evaluate(model, data, prep_fn=prepare_example, bin_size=5, **kwargs):
+    """Evaluates a model for different sentence sizes.
+        - Data: Example[]
+        - Model: Trained Model
+        - prep_fn: Method to turn Example into tensor
+    """
+    binned_data = prep_bin(data, 5)
+    results = []
+
+    for index, examples in enumerate(binned_data):
+        _, _, acc = simple_evaluate(model, examples, prep_fn)
+        results.push(acc)
+    
+    return results
+
+    # bin = list of entries, where each entry is mapped to corresponding sent
+    # length
+
+
+     
+
+    # 1. Split data into bins: collect max-length of data, and then, do something with it
