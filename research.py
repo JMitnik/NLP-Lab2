@@ -264,7 +264,7 @@ print(acc_table)
 # %%
 print(sig_table)
 
-#%%
+# %%
 from itertools import groupby
 
 def prep_bin(data, bin_size):
@@ -297,7 +297,6 @@ def sent_len_evaluate(model, data, prep_fn=prepare_example, bin_size=5, **kwargs
     # bin = list of entries, where each entry is mapped to corresponding sent
     # length
 
-
-     
-
-    # 1. Split data into bins: collect max-length of data, and then, do something with it
+# %%
+exp = next(do_experiment(7, models))
+exp.eval(sent_len_evaluate)
