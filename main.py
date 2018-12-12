@@ -251,18 +251,22 @@ Let's have a closer look at the properties of our vocabulary. Having a good idea
 # What is the ID for "century?"
 print(v.w2i['century'])
 
+
 # %%
 # What are the first 10 words in the vocabulary?
 print(v.i2w[:10])
+
 
 # %%
 # What are the 10 most common words?
 print(v.i2w[2:12])
 print([v.freqs[i] for i in v.i2w[2:12]])
 
+
 # %%
 # And how many words are there with frequency 1?
 len([w for w in v.i2w if v.freqs[w]==1])
+
 
 # %%
 # Finally 20 random words from the vocabulary.
@@ -455,7 +459,6 @@ Make sure that you understand this code block.
 
 # %%
 
-# %%
 def simple_evaluate(model, data, prep_fn=prepare_example, **kwargs):
   """Accuracy of a model on given data set."""
   correct = 0
@@ -975,8 +978,6 @@ Store the words that are not in the word vector set in the set below.
 # %%
 words_not_found = set()
 # YOUR CODE HERE
-word2vec_set = set(v.freqs)
-
 
 # %%
 '''
@@ -1166,6 +1167,7 @@ class MyLSTMCell(nn.Module):
     return "{}({:d}, {:d})".format(
         self.__class__.__name__, self.input_size, self.hidden_size)
 
+
 # %%
 '''
 #### Optional: Efficient Matrix Multiplication
@@ -1281,6 +1283,7 @@ class LSTMClassifier(nn.Module):
     # we use the last hidden state to classify the sentence
     logits = self.output_layer(final)
     return logits
+
 
 # %%
 '''

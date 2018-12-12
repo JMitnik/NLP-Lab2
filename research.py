@@ -174,7 +174,7 @@ name2model_p = {'bow': bow_p, 'cbow': cbow_p, 'deep_cbow': deep_cbow_p, 'pt_deep
 
 !cp /gdrive/My\ Drive/pts/*.pt ./
 
-def do_experiment(rd_seed, exp_name_li=list(name2class.keys())):
+def do_experiment(rd_seed, exp_name_li=list(name2class.keys()), train_embed=False):
     torch.cuda.manual_seed(rd_seed)
     np.random.seed(rd_seed)
     for n in exp_name_li:
@@ -185,7 +185,9 @@ def do_experiment(rd_seed, exp_name_li=list(name2class.keys())):
         if n.startswith('pt') or n.endswith('lstm'):
             with torch.no_grad():
                 model.embed.weight.data.copy_(torch.from_numpy(vectors))
-                model.embed.weight.requires_grad = False
+
+                if not train_embed:
+                    model.embed.weight.requires_grad = False
         exp = Experiment(model, optimizer, exp_name='{}_rd_seed_{}'.format(
             n, rd_seed), **name2xargs[n])
         exp.train()
