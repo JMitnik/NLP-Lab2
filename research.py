@@ -278,8 +278,10 @@ def prep_bin(data, bin_size):
         
     return bins
 
+
+# BE SURE TO MAKE SURE TO COPY AL .ct files!
 # %%
-def sent_len_evaluate(model, data, prep_fn=prepare_example, bin_size=5, **kwargs):
+def sent_len_evaluate(model, data,  batch_fn=get_minibatch, bin_size=5 , prep_fn=prepare_minibatch, **kwargs):
     """Evaluates a model for different sentence sizes.
         - Data: Example[]
         - Model: Trained Model
@@ -289,14 +291,15 @@ def sent_len_evaluate(model, data, prep_fn=prepare_example, bin_size=5, **kwargs
     results = []
 
     for index, examples in enumerate(binned_data):
-        _, _, acc = simple_evaluate(model, examples, prep_fn)
-        results.push(acc)
+        pred, _, _, acc = evaluate_with_results(model, examples, batch_fn, prep_fn)
+        results.append(acc)
     
-    return results
-
+    # Results is not exaclty correct, as eval expects only one result, but this indicates the results for each 'bin' atm
+    return _, _, _, results
     # bin = list of entries, where each entry is mapped to corresponding sent
     # length
 
 # %%
 exp = next(do_experiment(7, models))
-exp.eval(sent_len_evaluate)
+exp.eval(eval_fn=sent_len_evaluate, batch_fn=get_minibatch,
+                    prep_fn=prepare_treelstm_minibatch)
