@@ -172,6 +172,7 @@ tree_lstm_p = [len(nv.w2i), 300, 150, len(t2i), nv]
 name2model_p = {'bow': bow_p, 'cbow': cbow_p, 'deep_cbow': deep_cbow_p, 'pt_deep_cbow': pt_deep_cbow_p,
                 'lstm': lstm_p, 'mini_lstm':lstm_p, 'tree_lstm': tree_lstm_p, 'subtree_lstm': tree_lstm_p}
 
+!cp /gdrive/My\ Drive/pts/*.pt ./
 
 def do_experiment(rd_seed, exp_name_li=list(name2class.keys())):
     torch.cuda.manual_seed(rd_seed)
