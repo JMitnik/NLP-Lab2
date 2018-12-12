@@ -21,7 +21,6 @@ We will cover the following approaches:
 - Deep continuous bag-of-words (Deep CBOW)
 - LSTM
 - TreeLSTM
-
 '''
 
 # %%
@@ -51,10 +50,11 @@ import math
 import numpy as np
 import nltk
 import matplotlib.pyplot as plt
-plt.style.use('default')
+
+TRAIN = False
+PLOT = False
 
 # %%
-
 # !wget http://nlp.stanford.edu/sentiment/trainDevTestTrees_PTB.zip
 # !unzip trainDevTestTrees_PTB.zip
 
@@ -162,9 +162,6 @@ print("dev", len(dev_data))
 print("test", len(test_data))
 
 # %%
-dev_data[1]
-
-# %%
 '''
 Let's check out an example object.
 '''
@@ -180,7 +177,6 @@ print("First train example label:",  example.label)
 #### Vocabulary 
 To work with this data we will need a vocabulary.
 The job of the vocabulary is to map each word to a unique ID.
-
 '''
 
 # %%
@@ -231,7 +227,6 @@ Let's build the token vocabulary!
 When randomly initializing word vectors, we take the words in our training
 set and assign them unique IDs, and assign all other words to <unk>, 
 because those we cannot learn a vector for based on our training data.
-
 '''
 
 # %%
@@ -254,24 +249,27 @@ Let's have a closer look at the properties of our vocabulary. Having a good idea
 
 # %%
 # What is the ID for "century?"
-v.w2i['century']
+print(v.w2i['century'])
 
 # %%
 # What are the first 10 words in the vocabulary?
-v.i2w[0:10]
+print(v.i2w[:10])
 
 # %%
 # What are the 10 most common words?
-v.freqs.most_common(10)
+print(v.i2w[2:12])
+print([v.freqs[i] for i in v.i2w[2:12]])
 
 # %%
 # And how many words are there with frequency 1?
-len([key for key, value in dict(v.freqs).items() if value == 1])
+len([w for w in v.i2w if v.freqs[w]==1])
 
 # %%
 # Finally 20 random words from the vocabulary.
 # This is a simple way to get a feeling for the data.
-np.random.choice(v.i2w, 20)
+sampled = np.random.random_integers(0, len(v.w2i) - 1, (20,))
+print([v.i2w[i] for i in sampled])
+
 
 # %%
 '''
@@ -287,8 +285,8 @@ i2t
 # And let's also create the opposite mapping.
 # We won't use a Vocabulary for this (although we could), since the labels
 # are already numeric.
-
 t2i = OrderedDict({p : i for p, i in zip(i2t, range(len(i2t)))})
+t2i
 
 # %%
 '''
@@ -301,13 +299,13 @@ We are going to need PyTorch and Google Colab does not have it installed by defa
 
 # %%
 # http://pytorch.org/
-from os.path import exists
-from wheel.pep425tags import get_abbr_impl, get_impl_ver, get_abi_tag
-platform = '{}{}-{}'.format(get_abbr_impl(), get_impl_ver(), get_abi_tag())
-cuda_output = !ldconfig -p|grep cudart.so|sed -e 's/.*\.\([0-9]*\)\.\([0-9]*\)$/cu\1\2/'
-accelerator = cuda_output[0] if exists('/dev/nvidia0') else 'cpu'
+# from os.path import exists
+# from wheel.pep425tags import get_abbr_impl, get_impl_ver, get_abi_tag
+# platform = '{}{}-{}'.format(get_abbr_impl(), get_impl_ver(), get_abi_tag())
+# cuda_output = !ldconfig -p|grep cudart.so|sed -e 's/.*\.\([0-9]*\)\.\([0-9]*\)$/cu\1\2/'
+# accelerator = cuda_output[0] if exists('/dev/nvidia0') else 'cpu'
 
-!pip install -q http://download.pytorch.org/whl/{accelerator}/torch-0.4.1-{platform}-linux_x86_64.whl torchvision
+# !pip install -q http://download.pytorch.org/whl/{accelerator}/torch-0.4.1-{platform}-linux_x86_64.whl torchvision
 import torch
 from torch import optim
 from torch import nn
@@ -375,7 +373,7 @@ class BOW(nn.Module):
     super(BOW, self).__init__()
     self.vocab = vocab
     
-    # this is a trained look-up table with word embeddingst
+    # this is a trained look-up table with word embeddings
     self.embed = nn.Embedding(vocab_size, embedding_dim)
     
     # this is a trained bias term
@@ -411,6 +409,7 @@ print(bow_model)
 '''
 
 # %%
+
 # Here we print each parameter name, shape, and if it is trainable.
 def print_parameters(model):
   total = 0
@@ -452,8 +451,9 @@ def prepare_example(example, vocab):
 We will need one more thing: an evaluation metric.
 How many predictions do we get right? The accuracy will tell us.
 Make sure that you understand this code block.
-
 '''
+
+# %%
 
 # %%
 def simple_evaluate(model, data, prep_fn=prepare_example, **kwargs):
@@ -544,7 +544,7 @@ def train_model(model, optimizer, num_iterations=10000,
                 batch_fn=get_examples, 
                 prep_fn=prepare_example,
                 eval_fn=simple_evaluate,
-                batch_size=1, eval_batch_size=None):
+                batch_size=1, eval_batch_size=None, exp_name=None, train_data=train_data):
   """Train a model."""  
   iter_i = 0
   train_loss = 0.
@@ -562,6 +562,8 @@ def train_model(model, optimizer, num_iterations=10000,
   if eval_batch_size is None:
     eval_batch_size = batch_size
   
+  if exp_name is None:
+      exp_name = model.__class__.__name__
   while True:  # when we run out of examples, shuffle and continue
     for batch in batch_fn(train_data, batch_size=batch_size):
 
@@ -578,13 +580,20 @@ def train_model(model, optimizer, num_iterations=10000,
       train_loss += loss.item()
 
       # backward pass
-      # 1. erase previous gradients
-      # 2. compute gradients
-      # 3. update weights - take a small step in the opposite dir of the gradient
-      model.zero_grad()
+      # Tip: check the Introduction to PyTorch notebook.
+      
+      # erase previous gradients
+      optimizer.zero_grad()
+    #   raise NotImplementedError("Implement this")
+      # YOUR CODE HERE
+      
+      # compute gradients
       loss.backward()
-      optimizer.step()
+      # YOUR CODE HERE
 
+      # update weights - take a small step in the opposite dir of the gradient
+      # YOUR CODE HERE
+      optimizer.step()
       print_num += 1
       iter_i += 1
 
@@ -608,7 +617,7 @@ def train_model(model, optimizer, num_iterations=10000,
           print("new highscore")
           best_eval = accuracy
           best_iter = iter_i
-          path = "{}.pt".format(model.__class__.__name__)
+          path = "{}.pt".format(exp_name)
           ckpt = {
               "state_dict": model.state_dict(),
               "optimizer_state_dict": optimizer.state_dict(),
@@ -623,7 +632,7 @@ def train_model(model, optimizer, num_iterations=10000,
         
         # evaluate on train, dev, and test with best model
         print("Loading best model")
-        path = "{}.pt".format(model.__class__.__name__)        
+        path = "{}.pt".format(exp_name)
         ckpt = torch.load(path)
         model.load_state_dict(ckpt["state_dict"])
         
@@ -656,19 +665,20 @@ print(bow_model)
 bow_model = bow_model.to(device)
 
 optimizer = optim.Adam(bow_model.parameters(), lr=0.0005)
-bow_losses, bow_accuracies = train_model(
-    bow_model, optimizer, num_iterations=30000, 
-    print_every=1000, eval_every=1000)
+if TRAIN:
+  bow_losses, bow_accuracies = train_model(
+      bow_model, optimizer, num_iterations=30000, 
+      print_every=1000, eval_every=1000)
 
 # %%
 # This will plot the validation accuracies across time.
-plt.plot(bow_accuracies)
-plt.show()
+if PLOT:
+  plt.plot(bow_accuracies)
 
 # %%
 # This will plot the training loss over time.
-plt.plot(bow_losses)
-plt.show()
+if PLOT:
+  plt.plot(bow_losses)
 
 # %%
 '''
@@ -701,41 +711,49 @@ Train your CBOW model and plot the validation accuracy and training loss over ti
 '''
 
 # %%
-EMBED_DIMENSION = 300
-
 class CBOW(nn.Module):
-    def __init__(self, vocab_size, nr_classes, vocab, embed_d = EMBED_DIMENSION):
-        super().__init__()
-        self.vocab = vocab
-        self.vocab_size = vocab_size
-        self.nr_classes = nr_classes
-        self.embed_d = embed_d
-        
-        self.embed = nn.Embedding(vocab_size, embed_d)
-        self.output_layer = nn.Linear(self.embed_d, self.nr_classes, bias=True)
-    
-    def forward(self, inputs):
-        embeds = self.embed(inputs)
-        logits = embeds.sum(1)
-            
-        return self.output_layer(logits)
+  """A continuous bag-of-words model"""
 
-# %%
-cbow_model = CBOW(len(v.i2w), 5, v)
+  def __init__(self, vocab_size, embedding_dim, output_dim, vocab):
+    super(CBOW, self).__init__()
+    self.vocab = vocab
+
+    # this is a trained look-up table with word embeddings
+    self.embed = nn.Embedding(vocab_size, embedding_dim)
+
+    # this is a trained bias term
+    self.bias = nn.Parameter(torch.zeros(embedding_dim), requires_grad=True)
+
+    self.net = nn.Linear(embedding_dim, output_dim)
+
+  def forward(self, inputs):
+    # this is the forward pass of the neural network
+    # given inputs, it computes the output
+
+    # this looks up the embeddings for each word ID in inputs
+    # the result is a sequence of word embeddings
+    embeds = self.embed(inputs)
+
+    # the output is the sum across the time dimension (1)
+    # with the bias term added
+    logits = self.net(embeds.sum(1) + self.bias)
+
+    return logits
+embedding_dim = 300
+cbow_model = CBOW(len(v.w2i), embedding_dim, len(t2i), vocab=v)
+print(cbow_model)
 
 cbow_model = cbow_model.to(device)
 
-optimizer = optim.Adam(cbow_model.parameters(), lr=0.0005)
+cbow_optimizer = optim.Adam(cbow_model.parameters(), lr=0.0005)
+if TRAIN:
+  cbow_losses, cbow_accuracies = train_model(
+      cbow_model, cbow_optimizer, num_iterations=30000, 
+      print_every=1000, eval_every=1000)
 
-cbow_losses, cbow_accuracies = train_model(
-    cbow_model, optimizer, num_iterations=30000, 
-    print_every=1000, eval_every=1000)
-
-# %%
-plt.plot(cbow_accuracies)
-
-# %%
-plt.plot(cbow_losses)
+if PLOT:
+  plt.plot(cbow_accuracies)
+  plt.plot(cbow_losses)
 
 # %%
 '''
@@ -765,40 +783,61 @@ We recommend using [nn.Sequential](https://pytorch.org/docs/stable/nn.html?highl
 '''
 
 # %%
-HIDDEN_LAYER = 100
-
 class DeepCBOW(nn.Module):
-    def __init__(self, vocab_size, nr_classes, vocab, embed_d = EMBED_DIMENSION, hidden_layer_size = 100):
-        super().__init__()
-        self.vocab = vocab
-        self.vocab_size = vocab_size
-        self.nr_classes = nr_classes
-        self.embed_d = embed_d        
-        self.embed = nn.Embedding(vocab_size, embed_d)
-        
-        self.layers = nn.Sequential(
-            nn.Linear(self.embed_d, hidden_layer_size),
-            nn.Tanh(),
-            nn.Linear(hidden_layer_size, hidden_layer_size),
-            nn.Tanh(),
-            nn.Linear(hidden_layer_size, nr_classes)
-        )
-    
-    def forward(self, inputs):
-        embeds = self.embed(inputs)
-        logits = embeds.sum(1)
-                
-        return self.layers(logits)
+  """A continuous bag-of-words model"""
+
+  def __init__(self, vocab_size, embedding_dim, hidden_dim, output_dim, vocab):
+    super(DeepCBOW, self).__init__()
+    self.vocab = vocab
+
+    # this is a trained look-up table with word embeddings
+    self.embed = nn.Embedding(vocab_size, embedding_dim)
+
+    # this is a trained bias term
+    self.bias = nn.Parameter(torch.zeros(embedding_dim), requires_grad=True)
+
+    self.net = nn.Sequential(nn.Linear(embedding_dim, hidden_dim),
+                             nn.Tanh(),
+                             nn.Linear(hidden_dim, hidden_dim),
+                             nn.Tanh(),
+                             nn.Linear(hidden_dim, output_dim))
+
+  def forward(self, inputs):
+    # this is the forward pass of the neural network
+    # given inputs, it computes the output
+
+    # this looks up the embeddings for each word ID in inputs
+    # the result is a sequence of word embeddings
+    embeds = self.embed(inputs)
+
+    # the output is the sum across the time dimension (1)
+    # with the bias term added
+    logits = self.net(embeds.sum(1) + self.bias)
+
+    return logits
+
+hidden_dim = 100
+deep_cbow_model = DeepCBOW(len(v.w2i), embedding_dim, hidden_dim, len(t2i), vocab=v)
+print(deep_cbow_model)
+
+deep_cbow_model = deep_cbow_model.to(device)
+
+deep_cbow_optimizer = optim.Adam(deep_cbow_model.parameters(), lr=0.0005)
+if TRAIN:
+  deep_cbow_losses, deep_cbow_accuracies = train_model(
+      deep_cbow_model, deep_cbow_optimizer, num_iterations=30000,
+      print_every=1000, eval_every=1000)
+
+
 
 # %%
-dcbow_model = DeepCBOW(len(v.i2w), 5, v)
-dcbow_model = dcbow_model.to(device)
+if PLOT:
+  plt.plot(deep_cbow_accuracies)
 
-optimizer = optim.Adam(dcbow_model.parameters(), lr=0.0005)
 
-dcbow_losses, dcbow_accuracies = train_model(
-    dcbow_model, optimizer, num_iterations=30000, 
-    print_every=1000, eval_every=1000)
+# %%
+if PLOT:
+  plt.plot(deep_cbow_losses)
 
 # %%
 '''
@@ -841,7 +880,7 @@ If you want to compare your results to the Stanford paper later on, then you sho
 # You only need to do this once.
 # Please comment this cell out after downloading.
 
-!wget https://gist.githubusercontent.com/bastings/b094de2813da58056a05e8e7950d4ad1/raw/3fbd3976199c2b88de2ae62afc0ecc6f15e6f7ce/glove.840B.300d.sst.txt
+# !wget https://gist.githubusercontent.com/bastings/b094de2813da58056a05e8e7950d4ad1/raw/3fbd3976199c2b88de2ae62afc0ecc6f15e6f7ce/glove.840B.300d.sst.txt
 
 # %%
 # This downloads the word2vec 300D Google News vectors 
@@ -850,21 +889,18 @@ If you want to compare your results to the Stanford paper later on, then you sho
 
 # You only need to do this once.
 # Please comment this out after downloading.
-!wget https://gist.githubusercontent.com/bastings/4d1c346c68969b95f2c34cfbc00ba0a0/raw/76b4fefc9ef635a79d0d8002522543bc53ca2683/googlenews.word2vec.300d.txt
+# !wget https://gist.githubusercontent.com/bastings/4d1c346c68969b95f2c34cfbc00ba0a0/raw/76b4fefc9ef635a79d0d8002522543bc53ca2683/googlenews.word2vec.300d.txt
 
 # %%
 # Mount Google Drive (to save the downloaded files)
-try:
-    from google.colab import drive
-    drive.mount('/gdrive')
-except:
-    print("No google!")
+# from google.colab import drive
+# drive.mount('/gdrive')
 
 # %%
-# # Copy word vectors *to* Google Drive
+# Copy word vectors *to* Google Drive
 
-# # You only need to do this once.
-# # Please comment this out after running it. 
+# You only need to do this once.
+# Please comment this out after running it. 
 # !cp "glove.840B.300d.sst.txt" "/gdrive/My Drive/"
 # !cp "googlenews.word2vec.300d.txt" "/gdrive/My Drive/"
 
@@ -873,8 +909,8 @@ except:
 # here is where you copy them back to the Colab notebook.
 
 # Copy Glove vectors *from* Google Drive
-!cp "/gdrive/My Drive/glove.840B.300d.sst.txt" .
-!cp "/gdrive/My Drive/googlenews.word2vec.300d.txt" .
+# !cp "/gdrive/My Drive/glove.840B.300d.sst.txt" .
+# !cp "/gdrive/My Drive/googlenews.word2vec.300d.txt" .
 
 # %%
 '''
@@ -882,8 +918,6 @@ At this point you have the pre-trained word embedding files, but what do they lo
 '''
 
 # %%
-WORD2VEC_PATH = "googlenews.word2vec.300d.txt"
-word2vec_gen = filereader(WORD2VEC_PATH)
 # Exercise: Print the first 4 lines of the files that you downloaded.
 # What do you see?
 
@@ -911,31 +945,22 @@ After storing each vector in a list `vectors`, turn in into a numpy matrix like 
 ```
  
  
-
 '''
 
 # %%
-word2vec_gen = filereader(WORD2VEC_PATH)
-
-vectors = []
-v = Vocabulary()
-vectors.append(np.zeros((300)))
-vectors.append(np.zeros((300)))
-
-for line in word2vec_gen:
-    line_list = line.split(' ')
-    token, vector_data = line_list[:1][0], np.array(line_list[1:])
-    vectors.append(vector_data)
-    v.count_token(token)
-
-v.build()
+# YOUR CODE HERE
+# v = ...
+# vectors = ...
+nv = Vocabulary()
+vectors = [np.random.random((300,)), np.zeros((300,))]
+with open('/gdrive/My Drive/glove.840B.300d.sst.txt', 'r') as f:
+  for l in f.readlines():
+    w, arr_str = l.split(' ', 1)
+    nv.count_token(w)
+    vectors.append(np.fromstring(arr_str, dtype=np.float32, sep=' '))
+nv.build()
 vectors = np.stack(vectors, axis=0)
 
-# %%
-
-
-# %%
-vectors.shape
 
 # %%
 '''
@@ -958,7 +983,6 @@ word2vec_set = set(v.freqs)
 #### Exercise: train Deep CBOW with (fixed) pre-trained embeddings
 
 Now train Deep CBOW again using the pre-trained word vectors.
-
 '''
 
 # %%
@@ -970,8 +994,9 @@ class PTDeepCBOW(DeepCBOW):
 
 # %%
 # YOUR CODE HERE
-# pt_deep_cbow_model = ..
-pt_deep_cbow_model = PTD
+pt_deep_cbow_model = PTDeepCBOW(
+    len(nv.w2i), embedding_dim, hidden_dim, len(t2i), vocab=nv)
+
 # copy pre-trained word vectors into embeddings table
 pt_deep_cbow_model.embed.weight.data.copy_(torch.from_numpy(vectors))
 
@@ -983,12 +1008,20 @@ pt_deep_cbow_model = pt_deep_cbow_model.to(device)
 
 # train the model
 # YOUR CODE HERE
+pt_deep_cbow_optimizer = optim.Adam(pt_deep_cbow_model.parameters(), lr=0.0005)
+if TRAIN:
+  pt_deep_cbow_losses, pt_deep_cbow_accuracies = train_model(
+      pt_deep_cbow_model, pt_deep_cbow_optimizer, num_iterations=30000,
+      print_every=1000, eval_every=1000)
+
 
 # %%
-# plot dev accuracies
+if PLOT:  
+  plt.plot(pt_deep_cbow_accuracies)
 
 # %%
-# plot train loss
+if PLOT:  
+  plt.plot(pt_deep_cbow_losses)
 
 # %%
 '''
@@ -1056,9 +1089,31 @@ class MyLSTMCell(nn.Module):
     self.input_size = input_size
     self.hidden_size = hidden_size
     self.bias = bias
-    
+    self.use_acc = True
     # YOUR CODE HERE
+    if not self.use_acc:
+      self.w_ii = nn.Parameter(torch.zeros(input_size, hidden_size))
+      self.b_ii = nn.Parameter(torch.zeros(1, hidden_size))
+      self.w_if = nn.Parameter(torch.zeros(input_size, hidden_size))
+      self.b_if = nn.Parameter(torch.zeros(1, hidden_size))
+      self.w_ig = nn.Parameter(torch.zeros(input_size, hidden_size))
+      self.b_ig = nn.Parameter(torch.zeros(1, hidden_size))
+      self.w_io = nn.Parameter(torch.zeros(input_size, hidden_size))
+      self.b_io = nn.Parameter(torch.zeros(1, hidden_size))
 
+      self.w_hi = nn.Parameter(torch.zeros(hidden_size, hidden_size))
+      self.b_hi = nn.Parameter(torch.zeros(1, hidden_size))
+      self.w_hf = nn.Parameter(torch.zeros(hidden_size, hidden_size))
+      self.b_hf = nn.Parameter(torch.zeros(1, hidden_size))
+      self.w_hg = nn.Parameter(torch.zeros(hidden_size, hidden_size))
+      self.b_hg = nn.Parameter(torch.zeros(1, hidden_size))
+      self.w_ho = nn.Parameter(torch.zeros(hidden_size, hidden_size))
+      self.b_ho = nn.Parameter(torch.zeros(1, hidden_size))
+    else:
+      self.w_i = nn.Parameter(torch.zeros(input_size, 4*hidden_size))
+      self.w_h = nn.Parameter(torch.zeros(hidden_size, 4*hidden_size))
+      self.b_i = nn.Parameter(torch.zeros(1, 4*hidden_size))
+      self.b_h = nn.Parameter(torch.zeros(1, 4*hidden_size))
     self.reset_parameters()
 
   def reset_parameters(self):
@@ -1072,12 +1127,28 @@ class MyLSTMCell(nn.Module):
     input is (batch, input_size)
     hx is ((batch, hidden_size), (batch, hidden_size))
     """
+    input = input_
     prev_h, prev_c = hx
-
+    if not self.use_acc:
+      i = torch.sigmoid(input@self.w_ii+self.b_ii+prev_h@self.w_hi+self.b_hi)
+      f = torch.sigmoid(input@self.w_if+self.b_if+prev_h@self.w_hf+self.b_hf)
+      g = torch.tanh(input@self.w_ig+self.b_ig+prev_h@self.w_hg+self.b_hg)
+      o = torch.sigmoid(input @ self.w_io + self.b_io + prev_h @ self.w_ho + self.b_ho)
+      c = prev_c * f + i * g
+      h = o * torch.tanh(c)
+    else:
+      pre_act = input @ self.w_i + self.b_i + prev_h @ self.w_h + self.b_h
+      i, f, g, o = pre_act.chunk(4, 1)
+      i = torch.sigmoid(i)
+      f = torch.sigmoid(f)
+      g = torch.tanh(g)
+      o = torch.sigmoid(o)
+      c = prev_c * f + i * g
+      h = o * torch.tanh(c)
     # project input and prev state
     # YOUR CODE HERE
     
-    raise NotImplementedError("Implement this")
+    # raise NotImplementedError("Implement this")
 
     # main LSTM computation    
 
@@ -1233,7 +1304,7 @@ These formulas simply mean that we *drop* certain parameters during training (by
 '''
 
 # %%
-lstm_model = LSTMClassifier(len(v.w2i), 300, 168, len(t2i), v)
+lstm_model = LSTMClassifier(len(nv.w2i), 300, 168, len(t2i), nv)
 
 # copy pre-trained word vectors into embeddings table
 with torch.no_grad():
@@ -1245,22 +1316,24 @@ print_parameters(lstm_model)
 
 lstm_model = lstm_model.to(device)
 optimizer = optim.Adam(lstm_model.parameters(), lr=3e-4)
-
-lstm_losses, lstm_accuracies = train_model(
-    lstm_model, optimizer, num_iterations=25000, 
-    print_every=250, eval_every=1000)
+if TRAIN:
+  lstm_losses, lstm_accuracies = train_model(
+      lstm_model, optimizer, num_iterations=25000, 
+      print_every=250, eval_every=1000)
 
 # %%
 # plot validation accuracy
+if PLOT:
+  plt.plot(lstm_accuracies)
 
 # %%
 # plot training loss
+if PLOT:
+  plt.plot(lstm_losses)
 
 # %%
 '''
 # Mini-batching
-
-
 '''
 
 # %%
@@ -1378,7 +1451,7 @@ for ex in mb:
 
 # %%
 # We should find 1s at the end where padding is.
-x, y = prepare_minibatch(mb, v)
+x, y = prepare_minibatch(mb, nv)
 print("x", x)
 print("y", y)
 
@@ -1423,7 +1496,7 @@ With this, let's run the LSTM again but now using minibatches!
 
 # %%
 lstm_model = LSTMClassifier(
-    len(v.w2i), 300, 168, len(t2i), v)
+    len(nv.w2i), 300, 168, len(t2i), nv)
 
 # copy pre-trained vectors into embeddings table
 with torch.no_grad():
@@ -1438,19 +1511,24 @@ lstm_model = lstm_model.to(device)
 batch_size = 25
 optimizer = optim.Adam(lstm_model.parameters(), lr=2e-4)
 
-lstm_losses, lstm_accuracies = train_model(
-    lstm_model, optimizer, num_iterations=30000, 
-    print_every=250, eval_every=250,
-    batch_size=batch_size,
-    batch_fn=get_minibatch, 
-    prep_fn=prepare_minibatch,
-    eval_fn=evaluate)
+if TRAIN:
+  lstm_losses, lstm_accuracies = train_model(
+      lstm_model, optimizer, num_iterations=30000, 
+      print_every=250, eval_every=250,
+      batch_size=batch_size,
+      batch_fn=get_minibatch, 
+      prep_fn=prepare_minibatch,
+      eval_fn=evaluate)
 
 # %%
 # plot validation accuracy
+if PLOT:
+  plt.plot(lstm_accuracies)
 
 # %%
 # plot training loss
+if PLOT:
+  plt.plot(lstm_losses)
 
 # %%
 '''
@@ -1478,9 +1556,6 @@ Note however that Tree LSTMs were also invented around the same time by two othe
 It is good scientific practice to cite all three papers in your report.
 
 If you study equations (9) to (14) in the paper, you will find that they are not all too different from the original LSTM that you already have.
-
-
-
 '''
 
 # %%
@@ -1488,8 +1563,6 @@ If you study equations (9) to (14) in the paper, you will find that they are not
 ## Computation
 
 Do you remember the `transitions_from_treestring` function all the way in the beginning of this lab? Every example contains a **transition sequence** made by this function. Let's look at it again:
-
-
 '''
 
 # %%
@@ -1539,19 +1612,15 @@ Now, our sentence is a (reversed) list of word embeddings.
 When we shift, we move a word embedding to the stack.
 When we reduce, we apply a Tree LSTM to the top two vectors, and the result is a single vector that we put back on the stack.
 After going through the whole transition sequence, we will have the root node on our stack! We can use that to classify the sentence.
-
-
 '''
 
 # %%
 '''
 ## Obtaining the transition sequence
-
 '''
 
 # %%
 '''
-
 So what goes on in the `transitions_from_treestring` function?
 
 The idea ([explained in this blog post](https://devblogs.nvidia.com/recursive-neural-networks-pytorch/)) is that, if we had a tree, we could traverse through the tree, and every time that we find a node containing only a word, we output a SHIFT.
@@ -1664,18 +1733,18 @@ class TreeLSTMCell(nn.Module):
     
     # YOUR CODE HERE
     # You only need to complete the commented lines below.
-    raise NotImplementedError("Implement this.")
+#     raise NotImplementedError("Implement this.")
 
     # The shape of each of these is [batch_size, hidden_size]
 
-    # i = ...
-    # f_l = ...    
-    # f_r = ...
-    # g = ...    
-    # o = ...
+    i = torch.sigmoid(i)
+    f_l = torch.sigmoid(f_l)
+    f_r = torch.sigmoid(f_r)
+    g = torch.tanh(g)
+    o = torch.sigmoid(o)
 
-    # c = ...
-    # h = ...
+    c = prev_c_l*f_l+prev_c_r*f_r+i*g
+    h = o*torch.tanh(c)
     
     return h, c
   
@@ -1755,7 +1824,6 @@ Before passing two lists of children to the reduce layer (an instance of `TreeLS
 In the same line where we batched the children, we unbatch the output of the forward pass to become a list of states of length `L` again. We do this because we need to loop over each example's transition at the current time step and push the children that are reduced into a parent to the stack.
 
 *The batch and unbatch functions let us switch between the "PyTorch world" (Tensors) and the Python world (easy to manipulate lists).*
-
 '''
 
 # %%
@@ -1941,7 +2009,7 @@ def prepare_treelstm_minibatch(mb, vocab):
 # Now let's train the Tree LSTM!
 
 tree_model = TreeLSTMClassifier(
-    len(v.w2i), 300, 150, len(t2i), v)
+    len(nv.w2i), 300, 150, len(t2i), nv)
 
 with torch.no_grad():
   tree_model.embed.weight.data.copy_(torch.from_numpy(vectors))
@@ -1963,11 +2031,18 @@ def do_train(model):
       eval_fn=evaluate,
       batch_fn=get_minibatch,
       batch_size=25, eval_batch_size=25)
-  
-results = do_train(tree_model)
+if TRAIN:
+  results = do_train(tree_model)
 
 # %%
 # plot
+if PLOT:
+  acc, loss = results
+  plt.plot(acc)
+
+# %%
+if PLOT:  
+  plt.plot(loss)
 
 # %%
 '''
