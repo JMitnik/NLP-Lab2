@@ -35,11 +35,11 @@ affine transformation from $R^{300}$ to $R^D$.
 The Deep CBOW is a deeper extension on the CBOW matrix, and uses the benefit of
 multiple layers within its neural network's output to learn more information of
 these semantic representations during the forward pass of the neural network.
-Essentially, the matrix performs a linear transformation of the input ($R^{300}$)
-to a hidden layer size, which is in $R^{100}$. An activation function using the
-hyperbolic tangent (tanh) ensures non-linearity. After another linear
-transformation to the same $R^{100}$ and another tanh, the model maps these
-results to $R^D$ similarly to how CBOW did this. 
+Essentially, the matrix performs a linear transformation of the input
+($R^{300}$) to a hidden layer size, which is in $R^{100}$. An activation
+function using the hyperbolic tangent (tanh) ensures non-linearity. After
+another linear transformation to the same $R^{100}$ and another tanh, the model
+maps these results to $R^D$ similarly to how CBOW did this. 
 
 % TODO: Does this fit here, or in models, or something?
 % TODO: Decide if we need some source for this one?
