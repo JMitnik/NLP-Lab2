@@ -61,13 +61,41 @@
 
 ### Explain
 
+- Word embeddings
+
+	- Quote paper
+
+	- Embeddings
+
+		- Explain GLOVE
+
+			- ☑️ Steps
+
+				- 
+
 - Algorithms
 
-	- Word embeddings
-
-		- Quote paper
-
 	- Deep CBOW
+
+		- First introduce CBOW
+
+			- CBOW is like BOW, except the features aren’t counts, but vectors of arbitrary size
+
+				- Dimension: R^D
+
+				- These are semantic representations of a vector, not something we can interpret
+
+			- We sum these like in BOW
+
+			- By using the parameter W, we can learn the relationship between the summation of these semantic representations and the possible outputs
+
+				- Dimension of W:  R^(5xD)
+
+		- Extension on regular CBOW
+
+			- Same idea, except now, the output now consists of a number of layers
+
+				- Affine transformations from dimension E to 5, with Tanh activations in between
 
 	- LSTM
 
@@ -87,6 +115,12 @@
 
 	- Logistic regression
 
+###  ❓Optional/Potential
+
+- Parameters
+
+	- 📋 Example from Tree LSTM
+
 ### Table
 
 - (for each model)
@@ -105,10 +139,6 @@
 
 ### Data and resources
 
-- Embeddings
-
-	- Explain GLOVE
-
 - DATA
 
 	- Stanford data movie reviews short for 
@@ -121,19 +151,97 @@
 
 		- (We explain the task as): Infer sentiment for unseen data (testing)
 
-### Training the models
+		- 📰 About the paper
 
-- The `train_model` function
+			- Ignoring word order is not plausible, cannot classify negation for instance or weakly sentimental pbhrases
+
+			- Description of the dataset
+
+				- Consists of 10,662 excerpt sentences from different movie reviews
+
+					- Each sentence has as label the overall opinion of a writer’s review
+
+					- In total, consists of 215,154 phrases
+
+						- Each phrase has 
+
+							- Which were annotated by MTurk
+
+				- From length 20, full sentences
+
+					- The longer the sentence, the less neutral it tends to be
+
+			- Data is ‘fine-grained sentiment classified’
+
+			- 👍
+
+				- They are able to capture negation
+
+### Three instances of model trained
+
+- Training the models
+
+	- Each model is initially trained using the train_model
+
+		- Different parameters
+
+			- Each model is trained for 30000 iterations
+
+				- Except for vanilla LSTM, which gets trained for 25000
+
+			- Minibatch prep (size of a mini batch is 25)
+
+				- Mini-lstm is the minibatched variant, gets minibatched, and then prepped
+
+				- Tree lasts get minibatched and then 
+
+			- Learning rate
+
+			- Parameters
+
+	- Each model uses Adam for optimization
+
+		- 💬 Adam
+
+			- Variety of SGD with decaying learning rate
+
+			- Adam maintains learning rates for each parameter
+
+			- ❓ How does adam adapt LR
+
+				- Uses an exponential moving average of the gradient (mean) and squared gradient  (variance)
+
+				- Uses parameter beta1 and beta2 to control decay rate of these moving averages
+
+					- Starts as 1
+
+			- Adam has shown to work on sentiment analysis on IMDB sentiment analysis dataset
+
+				- 🤔 No paper found so far
+
+		- Has default parameters as decided by pytorch
+
+			- lr={{variable}}, betas=(0.9, 0.999), eps=1e-08, weight_decay=0, amsgrad=False
 
 ### Evaluation
 
-- Generic evaluation performance metric
+- Generic evaluation performance metric: Accuracy/variance
 
 ### ❗ Research-question specific
 
 - Subsubsection (for each research question)
 
 	- Explain per research question differences
+
+		- Note: Each result is averaged over three different seed-trained model
+
+			- RQ 1.  We set LSTM against CBOW , compare their accuracy/variance
+
+			- RQ 2. We compare LSTM with Tree LSTM and their accuracy/variance
+
+			- RQ 3.  We group our test set based on sentence length, in bins of range 5. We compare the performance of each bin for all of our models, averaged over three seeds
+
+			- RQ 4. We compare a tree model which was supervised per node, and one which was supervised per root node
 
 ## 📊 Results and Analysis
 
@@ -145,13 +253,13 @@
 
 		- Results in tabular form
 
-			- How important is word order for this task
-
-				- Accuracy/variance for Deep CBOW vs LSTM
-
 			- Does tree structure help for accruacy
 
 				- Accuracy/variance for LSTM vs Tree LSTM
+
+			- How important is word order for this task
+
+				- Accuracy/variance for Deep CBOW vs LSTM
 
 	- Question 3
 
