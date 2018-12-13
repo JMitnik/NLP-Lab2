@@ -278,6 +278,19 @@ def prep_bin(data, bin_size):
         
     return bins
 
+def split_data_on_sentlen(data, sent_len_split=20):
+    """Splits data into two parts, based on `sent_len_split`"""
+    result_l = []
+    result_r = []
+
+    for example in sorted_data:
+        if len(example.tokens) < sent_len_split:
+            result_l.append(example)
+        else:
+            result_r.append(example)
+    
+    return result_l, result_r
+
 
 # BE SURE TO MAKE SURE TO COPY AL .ct files!
 # %%
@@ -287,7 +300,7 @@ def sent_len_evaluate(model, data,  batch_fn=get_minibatch, bin_size=5 , prep_fn
         - Model: Trained Model
         - prep_fn: Method to turn Example into tensor
     """
-    binned_data = prep_bin(data, 5)
+    binned_data = split_data_on_sentlen(data, 20)
     results = []
 
     for index, examples in enumerate(binned_data):
