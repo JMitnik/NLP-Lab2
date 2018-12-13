@@ -70,6 +70,17 @@ This paper will attempt to answer some of the questions corresponding to the
     when dealing with long-scale semantics.
     % TODO: @Gongze, do you agree with the initial hypothesis? TODO: Add results
     % Might have inproper grammar and usage of word.
+    \item \textbf{How does N-ary Tree LSTM compare to the Child-Sum Tree LSTM?}
+    The N-ary tree-LSTM differs with Child-sum tree-LSTM in that the latter is
+    [agnostic] of the order of the child nodes. On implementation details, the
+    N-ary tree-LSTM has different gate parameter for each child, while Child-sum
+    use the same parameter for all the gate including forget gate. In most
+    cases, N-ary tree-LSTM first project then sum, while the Child-sum tree-LSTM
+    do the opposite. Hence they are suitable to different tasks: the N-ary
+    tree-LSTM is suitable to those trees where child nodes are ordered, and the
+    Child-sum tree-LSTM should work well on the order of child nodes does not
+    contribute to the context. In the sentiment classification task, we need
+    N-ary tree-LSTM since the word order is important to context extraction.
 \end{enumerate}
 
 % TODO: Add citation for Glove
