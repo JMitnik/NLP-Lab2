@@ -6,9 +6,10 @@ sentences in an efficient way. The basic idea is to cast all words in the
 vocabulary to a low dimensional real space in a fashion that the more close two
 words semantically, the more close they are in terms of Euclidean distance in
 the embedding space. The most common way to build up an embedding is to use
-word2vec\cite{mikolov2013distributed} with the assumption that the semantic of one word is related to the
-neighbor word distribution. A similar approach that captures the distribution by
-count the co-occurrence globally called GloVe\cite{pennington2014glove} is used in this paper.
+word2vec\cite{mikolov2013distributed} with the assumption that the semantic of
+one word is related to the neighbor word distribution. A similar approach that
+captures the distribution by count the co-occurrence globally called
+GloVe\cite{pennington2014glove} is used in this paper.
 
 \subsubsection{CBOW and Deep CBOW}
 The bag of words (BOW) model uses maximum likelihood to predict the most likely
@@ -52,30 +53,28 @@ cells, which receive an input $x_t$, and the 'hidden' state $h_t$ of the
 previous unit cell on t-1. This hidden state uses both of these inputs, performs
 a linear transformation and a nonlinear transformation such as the tanh
 function, and then send the hidden state to the next cell. Unfortunately, one of
-the major difficulties of RNNs is the exponential decay \textcolor{green}{I
-thought exponential decay refers to the decaying strategy, and a quick search
-dont give me anything about it with rnn. Just to reassure.} of $h_t$ as
-sentences grow {longer}, and more mutations are performed on $h_t$
-\cite{bengio1994learning}\textcolor{green}{what do the mutations act upon
-there}. This is more commonly referred to as the vanishing gradient problem.
+the major difficulties of RNNs is the exponential decay of the gradient vector
+over the length of a sentence\cite{bengio1994learning}. This is more commonly
+referred to as the vanishing gradient problem.
 
 Long-short term network (LSTM) models \cite{hochreiter1997long} were introduced
-in 1997, and introduced an additional cell state, $c_t$, to the core dynamics of
-the RNN. An LSTM unit's cell state serves as long-term memory, and any
-operations on this cell state is protected by gates. Each of these gates
-carefully regulates interactions with the cell states, such as updating or
-receiving information. For each unit in the network, a number of gates are
-traversed before calculating $h_t$. Firstly, the forget gate $f_t$ is
-responsible for deciding how much of $h_{t-1}$ is stored in the cell state by
-performing the calculation $f_t = \sigma(W_f * [h_{t-1}, x_t] + b_f)$. Next, the
-input gate decides how much of each value of the cell state to update, $i_t =
-\sigma(W_i * [h_{t-1}, x_t] + b_i)$. An intermediate step calculates the actual
-candidate selection of the input, by $C_t = tanh(W_c * [h_{t-1}, x_t] + b_c)$.
-These two can then be implemented to change the value of the cell state. The
-cell state is then finally accessed by an output gate, $o_t = \sigma(W_o *
-[h_{t-1}, x_t] + b_o)$, and multiplied by the tanh of the candidates, to
-calculate the new hidden state. Via this construction of gate access, the
-vanishing gradient problem is minimized.
+in 1997, and added an additional cell state, $c_t$, to the core dynamics of the
+RNN. The idea of this cell-state is to counter this major problem of RNN's. An
+LSTM unit's cell state serves as long-term memory, and any operations on this
+cell state is protected by gates. Each of these gates carefully regulates
+interactions with the cell states, such as updating or receiving information.
+For each unit in the network, a number of gates are traversed before calculating
+$h_t$. Firstly, the forget gate $f_t$ is responsible for deciding how much of
+$h_{t-1}$ is stored in the cell state by performing the calculation $f_t =
+\sigma(W_f * [h_{t-1}, x_t] + b_f)$. Next, the input gate decides how much of
+each value of the cell state to update, $i_t = \sigma(W_i * [h_{t-1}, x_t] +
+b_i)$. An intermediate step calculates the actual candidate selection of the
+input, by $C_t = tanh(W_c * [h_{t-1}, x_t] + b_c)$. These two can then be
+implemented to change the value of the cell state. The cell state is then
+finally accessed by an output gate, $o_t = \sigma(W_o * [h_{t-1}, x_t] + b_o)$,
+and multiplied by the tanh of the candidates, to calculate the new hidden state.
+Via this construction of gate access, the vanishing gradient problem is
+minimized.
 \subsubsection{Tree LSTM}
 While Recurrent Neural Networks and LSTMs process previous unit cells
 sequentially, Tree LSTM cells \cite{DBLP:journals/corr/TaiSM15}
