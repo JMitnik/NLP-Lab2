@@ -17,3 +17,6 @@
 paper/*.pdf
 
 __latexindent_temp.tex
+
+.DS_Store
+.ipynb_checkpoints/

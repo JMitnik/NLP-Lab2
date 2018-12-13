@@ -1,6 +1,15 @@
 \section{Background}
 \label{sec: background}
 \subsubsection{Word Embeddings}
+Word embedding is a fundamental technique we need to represent words even
+sentences in an efficient way. The basic idea is to cast all words in the
+vocabulary to a low dimensional real space in a fashion that the more close two
+words semantically, the more close they are in terms of Euclidean distance in
+the embedding space. The most common way to build up an embedding is to use
+word2vec\cite{mikolov2013distributed} with the assumption that the semantic of one word is related to the
+neighbor word distribution. A similar approach that captures the distribution by
+count the co-occurrence globally called GloVe\cite{pennington2014glove} is used in this paper.
+
 \subsubsection{CBOW and Deep CBOW}
 The bag of words (BOW) model uses maximum likelihood to predict the most likely
 sentiment class by summing vectors of size $R^{D}$, where D is the number of
@@ -11,7 +20,7 @@ has as consequence that no word-order is being memorized, and thus loses the
 predictive meaning of the context this implies.
 
 \begin{align*}
-    \hat{y} = \operatorname*{arg\,max}_label \sum^{N}_{i=0} log p(label|i)
+    \hat{y} = \operatorname*{arg\,max}_{label} \sum^{N}_{i=0} log p(label|i)
 \end{align*}
 
 The Continuous bag of word (CBOW) model is an extension of the BOW by changing
@@ -20,15 +29,15 @@ chosen to be 300) to house some semantic representation of each word.
 Furthermore, to ensure proper calculations, the model learns the corresponding
 mapping of these semantic representation to output classes by training a neural
 network and learning a weight matrix, $W$. The model concludes by performing an
-affine transformation from $R^300$ to $R^D$.
+affine transformation from $R^{300}$ to $R^D$.
 
 The Deep CBOW is a deeper extension on the CBOW matrix, and uses the benefit of
 multiple layers within its neural network's output to learn more information of
 these semantic representations during the forward pass of the neural network.
-Essentially, the matrix performs a linear transformation of the input ($R^300$)
-to a hidden layer size, which is in $R^100$. An activation function using the
+Essentially, the matrix performs a linear transformation of the input ($R^{300}$)
+to a hidden layer size, which is in $R^{100}$. An activation function using the
 hyperbolic tangent (tanh) ensures non-linearity. After another linear
-transformation to the same $R^100$ and another tanh, the model maps these
+transformation to the same $R^{100}$ and another tanh, the model maps these
 results to $R^D$ similarly to how CBOW did this. 
 
 % TODO: Does this fit here, or in models, or something?
@@ -38,15 +47,17 @@ results to $R^D$ similarly to how CBOW did this.
 \subsubsection{RNN and LSTM}
 When parsing sentences of arbitrary lengths, and attempting some inference based
 on these sentences, Recurrent Neural Networks (RNNs) can [interpret] this
-sequential data by learning a number of weights matrices. RNNS consist of unit
+sequential data by learning a number of weights matrices. RNNs consist of unit
 cells, which receive an input $x_t$, and the 'hidden' state $h_t$ of the
 previous unit cell on t-1. This hidden state uses both of these inputs, performs
 a linear transformation and a nonlinear transformation such as the tanh
 function, and then send the hidden state to the next cell. Unfortunately, one of
-the major difficulties of RNNs are the exponential decay of $h_t$ as
+the major difficulties of RNNs is the exponential decay \textcolor{green}{I
+thought exponential decay refers to the decaying strategy, and a quick search
+dont give me anything about it with rnn. Just to reassure.} of $h_t$ as
 sentences grow {longer}, and more mutations are performed on $h_t$
-\cite{bengio1994learning}. This is more commonly referred to as the vanishing 
-gradient problem.
+\cite{bengio1994learning}\textcolor{green}{what do the mutations act upon
+there}. This is more commonly referred to as the vanishing gradient problem.
 
 Long-short term network (LSTM) models \cite{hochreiter1997long} were introduced
 in 1997, and introduced an additional cell state, $c_t$, to the core dynamics of
