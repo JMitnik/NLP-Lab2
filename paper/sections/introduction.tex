@@ -38,26 +38,43 @@ This paper will attempt to answer some of the questions corresponding to the
     % TODO: Add cite for sequential introduction TODO: Add cite for tree
     % introduction TODO: Reflow bracketed text. TODO: Is this significant?
     \item \textbf{Performance on supervising sentiment per node?}
-    This paper is seeking to investigate if the Tree LSTM algorithm should be
-    trained on the supervision of the sentiment of individual words, or on the
-    sentiment of the sentences altogether. The initial hypothesis of this paper
-    argues that the supervision of individual nodes might decrease performance,
-    due to less context to account for negating sentiment, for instance.
+    % This paper is seeking to investigate if the Tree LSTM algorithm should be
+    % trained on the supervision of the sentiment of individual words, or on the
+    % sentiment of the sentences altogether. 
+    This paper is seeking to investigate whether adding additional supervision
+    on intermediate words or phrases will help the model capture the more
+    context-related sentiment. The initial hypothesis of this paper argues
+    that the supervision of individual nodes might decrease performance, due to
+    less context to account for negating sentiment, for instance.
     % TODO: @Gongze, do you agree with the above initial hypothesis and
-    % reasoning? TODO: Incorporate later results.
-    \item \textbf{Does decreasing sentence lengths help the model predict better?}
-    A model's performance might depend on how many words the model needs to keep
-    in store. Decreasing the sentence length might show the difference in model
-    performance, and which model relatively performs better with longer
-    sentences. Initially, this paper argues that Tree LSTM might perform the
-    best, as it has more cells to infer relevant knowledge from than regular
-    LSTM. 
+    % reasoning? ||| I want to add that the supervision is acted upon not only
+    % word level, rather on a phrase level. And also the later result might
+    % suggest a neutral effect of adding supervision, that is, no big gap
+    % between these two cases. I suspect its because we dont train it with proper
+    % learning rate or not until they converge. |||TODO: Incorporate later
+    % results.
+    \item \textbf{Will the performance vary much on different sentence length across models?}
+    % A model's performance might depend on how many words the model needs to keep
+    % in store. Decreasing the sentence length might show the difference in model
+    % performance, and which model relatively performs better with longer
+    % sentences. Initially, this paper argues that Tree LSTM might perform the
+    % best, as it has more cells to infer relevant knowledge from than regular
+    % LSTM. 
+    A model may behave very differently to sentences of different length,
+    because for longer sentences the sentiment semantics is more complex and
+    sometimes contradict itself in different parts. So whether a model performs
+    evenly on different length sentences and whether some model performs better
+    on capturing sentiments contexts in longer time scale is a crucial problem.
+    Initially, this paper argues that Tree LSTM might perform the best, as it
+    process the context in a hand-crafted structural way, thus more efficient
+    when dealing with long-scale semantics.
     % TODO: @Gongze, do you agree with the initial hypothesis? TODO: Add results
-
+    % Might have inproper grammar and usage of word.
 \end{enumerate}
 
 % TODO: Add citation for Glove
 In order to do so, the different models mentioned will be initialized with
-300-dimensional Glove vectors. The goal is to predict the sentiment of [Stanford
-Sentiment Treebank data], with the different settings corresponding to the [aforementioned
-research questions].
+300-dimensional GloVe\cite{pennington2014glove} vectors. The goal is to predict
+the sentiment of [Stanford Sentiment Treebank data], with the different settings
+corresponding to the [aforementioned research questions].
+% SST doesn't have a paper to cite, weird.
