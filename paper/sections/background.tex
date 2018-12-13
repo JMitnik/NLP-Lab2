@@ -2,11 +2,85 @@
 \label{sec: background}
 \subsubsection{Word Embeddings}
 \subsubsection{CBOW and Deep CBOW}
-The bag of words model is a popular and frequently used model to start
-exploration of data. The algorithm works by counting the number of times a word
-has occurred in the corpus. The simplicity of the algorithm has as consequence
-that no word-order is being memorized.
+The bag of words (BOW) model uses maximum likelihood to predict the most likely
+sentiment class by summing vectors of size $R^{D}$, where D is the number of
+sentiment labels. The BOW bases its likelihoods on the count of each word,
+[class-likelihoods, $p(label|word)$]. After summation, the label with the
+maximum likelihood is taken as the prediction. The simplicity of the algorithm
+has as consequence that no word-order is being memorized, and thus loses the
+predictive meaning of the context this implies.
 
-% CBOW: In
+\begin{align*}
+    \hat{y} = \operatorname*{arg\,max}_label \sum^{N}_{i=0} log p(label|i)
+\end{align*}
+
+The Continuous bag of word (CBOW) model is an extension of the BOW by changing
+the dimensionality of each of the vectors it sums to an arbitrary size (here
+chosen to be 300) to house some semantic representation of each word.
+Furthermore, to ensure proper calculations, the model learns the corresponding
+mapping of these semantic representation to output classes by training a neural
+network and learning a weight matrix, $W$. The model concludes by performing an
+affine transformation from $R^300$ to $R^D$.
+
+The Deep CBOW is a deeper extension on the CBOW matrix, and uses the benefit of
+multiple layers within its neural network's output to learn more information of
+these semantic representations during the forward pass of the neural network.
+Essentially, the matrix performs a linear transformation of the input ($R^300$)
+to a hidden layer size, which is in $R^100$. An activation function using the
+hyperbolic tangent (tanh) ensures non-linearity. After another linear
+transformation to the same $R^100$ and another tanh, the model maps these
+results to $R^D$ similarly to how CBOW did this. 
+
+% TODO: Does this fit here, or in models, or something?
+% TODO: Decide if we need some source for this one?
+% TODO: Add citation
+
 \subsubsection{RNN and LSTM}
+When parsing sentences of arbitrary lengths, and attempting some inference based
+on these sentences, Recurrent Neural Networks (RNNs) can [interpret] this
+sequential data by learning a number of weights matrices. RNNS consist of unit
+cells, which receive an input $x_t$, and the 'hidden' state $h_t$ of the
+previous unit cell on t-1. This hidden state uses both of these inputs, performs
+a linear transformation and a nonlinear transformation such as the tanh
+function, and then send the hidden state to the next cell. Unfortunately, one of
+the major difficulties of RNNs are the exponential decay of $h_t$ as
+sentences grow {longer}, and more mutations are performed on $h_t$
+\cite{bengio1994learning}. This is more commonly referred to as the vanishing 
+gradient problem.
+
+Long-short term network (LSTM) models \cite{hochreiter1997long} were introduced
+in 1997, and introduced an additional cell state, $c_t$, to the core dynamics of
+the RNN. An LSTM unit's cell state serves as long-term memory, and any
+operations on this cell state is protected by gates. Each of these gates
+carefully regulates interactions with the cell states, such as updating or
+receiving information. For each unit in the network, a number of gates are
+traversed before calculating $h_t$. Firstly, the forget gate $f_t$ is
+responsible for deciding how much of $h_{t-1}$ is stored in the cell state by
+performing the calculation $f_t = \sigma(W_f * [h_{t-1}, x_t] + b_f)$. Next, the
+input gate decides how much of each value of the cell state to update, $i_t =
+\sigma(W_i * [h_{t-1}, x_t] + b_i)$. An intermediate step calculates the actual
+candidate selection of the input, by $C_t = tanh(W_c * [h_{t-1}, x_t] + b_c)$.
+These two can then be implemented to change the value of the cell state. The
+cell state is then finally accessed by an output gate, $o_t = \sigma(W_o *
+[h_{t-1}, x_t] + b_o)$, and multiplied by the tanh of the candidates, to
+calculate the new hidden state. Via this construction of gate access, the
+vanishing gradient problem is minimized.
 \subsubsection{Tree LSTM}
+While Recurrent Neural Networks and LSTMs process previous unit cells
+sequentially, Tree LSTM cells \cite{DBLP:journals/corr/TaiSM15}
+\cite{DBLP:journals/corr/ZhuSG15} \cite{DBLP:journals/corr/LeZ15} contain
+multiple children cells from which each cell can obtain past knowledge. [Tai et
+al] suggest two variants on how these child cells can be implemented: Child-Sum
+Tree LSTMs and N-Ary Trees. For a Child-sum LSTM cell, a summation of all hidden
+k hidden states is calculated. Each gate vector in this variant is calculated
+similarly to regular LSTMs, except the LSTM stores an additional weight matrix
+per gate for how to incorporate all the previous solutions. For N-Ary trees, a
+unit cell additionally receives a previous memory cell. Instead of summing the
+previous hidden states beforehand, this variant does that in each gate with a
+weight matrix per assigned child. For instance, calculation of the input gate is
+altered to the form $i_j=\sigma(W^i*x_j +
+\sum\limits_{k=1}^{N}U_k^{i}h_{jl}+b^i)$. Kai et al states that this allows for
+more granular calculations, which can result in even more fine-tuned results.
+Furthermore, forget gates are calculated per child, which means that each child
+has assigned a weight matrix to each other child, and thus can find interaction
+via their parent. 
