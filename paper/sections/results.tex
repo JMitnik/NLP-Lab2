@@ -1,6 +1,11 @@
 \section{Results and Analysis}
 \label{sec: results}
-
+Table \ref{table: results-acc} shows the accuracy for each model, averaged over
+three different runs, after prediction of the test-set. Table \ref{table: sign}
+reflects the significance of these predictions when compared to another model.
+The [conjunction] of these metrics makes it possible to answer a number of
+research questions. To answer the first question, how important word order is,
+one only has to look at the accuracy resutls of BOW
 
 \begin{table*}[]
     \centering
@@ -14,16 +19,15 @@
 
 
 \begin{table*}[]
-    \begin{tabular}{lllllll}
-        Model name   & CBOW     & Deep CBOW & LSTM    & Mini LSTM & Tree LSTM & Subtree LSTM \\
-        CBOW         & -        & 0.63      & 1.13E-7 & 1.98E-23  & 2.77E-29  & 6.54E-20     \\
-        Deep CBOW    & 0.63     & -         & 0.001   & 1.22E-10  & 3.51E-15  & 1.38E-9      \\
-        LSTM         & 1.13E-7  & 0.001     & -       & 0.008     & 0.0003    & 0.02         \\
-        Mini LSTM    & 1.97E-23 & 1.21E-10  & 0.008   & -         & 0.34      & 0.73         \\
-        Tree LSTM    & 2.78E-29 & 3.52E-15  & 0.0003  & 0.34      & -         & 0.18         \\
-        Subtree LSTM & 6.54E-20 & 1.38E-9   & 0.019   & 0.72      & 0.18      & -           
+    \begin{tabular}{llllllll}
+                     & BOW     & CBOW     & DCBOW     & LSTM    & Mini LSTM & Tree LSTM & Subtree LSTM \\
+        CBOW         & -        & -        & 0.63      & 1.13E-7 & 1.98E-23  & 2.77E-29  & 6.54E-20     \\
+        Deep CBOW    & 0.63     & 0.63     & -         & 0.001   & 1.22E-10  & 3.51E-15  & 1.38E-9      \\
+        LSTM         & 1.13E-7  & 1.13E-7  & 0.001     & -       & 0.008     & 0.0003    & 0.02         \\
+        Mini LSTM    & 1.97E-23 & 1.97E-23 & 1.21E-10  & 0.008   & -         & 0.34      & 0.73         \\
+        Tree LSTM    & 2.78E-29 & 2.78E-29 & 3.52E-15  & 0.0003  & 0.34      & -         & 0.18         \\
+        Subtree LSTM & 1.38E-9  & 6.54E-20 & 1.38E-9   & 0.019   & 0.72      & 0.18      & -           
         \end{tabular}
     \label{table: sign}
     \caption{Significance of accuracy tests}
-    \end{table*}
-}
+\end{table*}
