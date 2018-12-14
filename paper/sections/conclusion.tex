@@ -1,2 +1,21 @@
 \section{Conclusion and Discussion}
 \label{sec: conclusion}
+Throught the designed experiments, we found:
+\begin{enumerate}
+    \vspace{-5pt}
+    \item The word order context is important, but not very important if you
+    have a proper pretrained embedding.
+    \vspace{-7pt}
+    \item Minibatch training may slightly reduce the performance on the test
+    set.
+    \vspace{-7pt}
+    \item LSTM benefits little on tree structure at least on this dataset as
+    opposed to expected.
+    \vspace{-7pt}
+    \item Tree-LSTM does not explicitly capture more context than vanilla LSTM
+    even with longer sentences.
+\end{enumerate}
+The original work\cite{tai2015improved} has much better results on tree LSTM, so
+some arguments above may not hold in their contexts. Hence we suggest other
+fellows do some tuning work on Tree-LSTM and Subtree-LSTM, in order to possibly
+obtain competitive results as presented in the original paper.

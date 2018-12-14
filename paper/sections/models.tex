@@ -1,2 +1,31 @@
 \section{Models}
 \label{sec: models}
+
+\begin{table*}[t]
+    \centering
+    \small
+    \begin{tabular}{llllllll}
+    BOW  & CBOW & DCBOW & DCBOW-PT & LSTM & Mini-LSTM & T-LSTM & ST-LSTM \\
+    $0.19\pm .04$ & $0.28\pm .07$ & $0.25\pm .02$ & $0.44\pm .01$ & $0.47\pm .01$ & $0.46\pm .004$ & $0.47\pm .01$ & $0.45\pm .01$ 
+    \end{tabular}
+    \label{table: results-acc}
+    \caption{Test-set accuracies of three models averaged over 3 seeds}
+\end{table*}
+
+
+\begin{table*}[t]
+    \small
+    \begin{tabular}{lllllllll}
+                     & BOW     & CBOW     & DCBOW  & DCBOW-PT   & LSTM    &
+                     Mini-LSTM & T-LSTM & ST-LSTM \\
+        CBOW         & 0.18  &   -   & 0.015  & 0.048 &0.0075&8.2E-5 & 2.0E-6 &3.3E-10     \\
+        DCBOW    & 0.39   &  0.015   &  -    &  0.57  & 0.15  & 2.3E-3  & 4.0E-5 & 8.8E-9     \\
+        DCBOW-PT & 0.17  &   0.048  &   0.57  &   -  &  0.58 &  0.093  &   0.015  & 3.6E-4 \\
+        LSTM         & 2.1E-4 &  7.6E-3 &  0.15  &  0.58 & -  &  0.32  &  0.075  & 4.0E-3      \\
+        Mini-LSTM    & 1.6E-5 &  8.2E-5 &  2.4E-3  &  0.093  &  0.32  &   -    &    0.48   &  0.057     \\
+        T-LSTM    & 5.3-7  & 2.0E-6 & 4.0E-5 &  0.015  & 0.07  &   0.48   &    -    &   0.24     \\
+        ST-LSTM & 8.3-19  &  3.3-10  &  8.8-9  & 3.6E-4 & 4.0E-3 &  0.057   &    0.24   &   -       
+        \end{tabular}
+    \label{table: sign}
+    \caption{Significance of accuracy tests across all models.}
+\end{table*}

@@ -10,49 +10,25 @@ predictions when compared to another model. The [conjunction] of these metrics
 makes it possible to answer a number of research questions. \\
 % \begin{enumerate}
     \vspace{-10pt}
-    \subsection{How important is word order for the task of classification of sentiment?} To answer this question, one only has to compare the accuracy
+    \subsection{How important is word order for the task of classification of
+    sentiment?} To answer this question, one only has to compare the accuracy
     results of BOW-like models and vanilla LSTM. Note that most of the BOW
     models are trained with random embedding initialization, except for
-    DCBOW-PT, so it is only fair to compare DCBOW-PT with LSTM. And we
-    can see LSTM is about 3 percent over the DCBOW-PT, which is a big gap.
+    DCBOW-PT, so it is only fair to compare DCBOW-PT with LSTM. And we can see
+    LSTM is about 3 percent over the DCBOW-PT, which is a big gap.
     \subsection{Does tree structure improve the accuracy as opposed to
     sequential learning?} We compare the accuracy of both T-LSTM with Mini-LSTM,
-    instead of vanilla LSTM, since T-LSTM is also trained in the minibatch way. The
-    mean of T-LSTM is over Mini-LSTM by 0.01, but considering the variance of both estimations, it is not sufficient to say tree structure brings a
+    instead of vanilla LSTM, since T-LSTM is also trained in the minibatch way.
+    The mean of T-LSTM is over Mini-LSTM by 0.01, but considering the variance
+    of both estimations, it is not sufficient to say tree structure brings a
     performance boost. The significance test in Table \ref{table: sign} agrees
     with this view.
     \subsection{Performance on supervising sentiment per-node?} 
     In opposite to our hypothesis, imposing supervision per-node on tree LSTM
     results in worse result in terms of mean accuracy on test set. The ST-LSTM
     performs worst among all LSTM models, and according to significance table,
-    the difference between ST-LSTM and T-LSTM is not statistically significant. It might result from the sparsity per batch and bad hyperparameters. However, we do observe less overfit in the training of ST-LSTM, suggesting adding per-node supervision might be a good regularizer.
+    the difference between ST-LSTM and T-LSTM is not statistically significant.
+    It might result from the sparsity per batch and bad hyperparameters.
+    However, we do observe less overfit in the training of ST-LSTM, suggesting
+    adding per-node supervision might be a good regularizer.
 % \end{enumerate}
-
-\begin{table*}[]
-    \centering
-    \small
-    \begin{tabular}{llllllll}
-    BOW  & CBOW & DCBOW & DCBOW-PT & LSTM & Mini-LSTM & T-LSTM & ST-LSTM \\
-    $0.19\pm .04$ & $0.28\pm .07$ & $0.25\pm .02$ & $0.44\pm .01$ & $0.47\pm .01$ & $0.46\pm .004$ & $0.47\pm .01$ & $0.45\pm .01$ 
-    \end{tabular}
-    \label{table: results-acc}
-    \caption{Test-set accuracies of three models averaged over 3 seeds}
-\end{table*}
-
-
-\begin{table*}[]
-    \small
-    \begin{tabular}{lllllllll}
-                     & BOW     & CBOW     & DCBOW  & DCBOW-PT   & LSTM    &
-                     Mini-LSTM & T-LSTM & ST-LSTM \\
-        CBOW         & 0.18  &   -   & 0.015  & 0.048 &0.0075&8.2E-5 & 2.0E-6 &3.3E-10     \\
-        DCBOW    & 0.39   &  0.015   &  -    &  0.57  & 0.15  & 2.3E-3  & 4.0E-5 & 8.8E-9     \\
-        DCBOW-PT & 0.17  &   0.048  &   0.57  &   -  &  0.58 &  0.093  &   0.015  & 3.6E-4 \\
-        LSTM         & 2.1E-4 &  7.6E-3 &  0.15  &  0.58 & -  &  0.32  &  0.075  & 4.0E-3      \\
-        Mini-LSTM    & 1.6E-5 &  8.2E-5 &  2.4E-3  &  0.093  &  0.32  &   -    &    0.48   &  0.057     \\
-        T-LSTM    & 5.3-7  & 2.0E-6 & 4.0E-5 &  0.015  & 0.07  &   0.48   &    -    &   0.24     \\
-        ST-LSTM & 8.3-19  &  3.3-10  &  8.8-9  & 3.6E-4 & 4.0E-3 &  0.057   &    0.24   &   -       
-        \end{tabular}
-    \label{table: sign}
-    \caption{Significance of accuracy tests across all models.}
-\end{table*}
