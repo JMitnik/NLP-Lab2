@@ -191,7 +191,7 @@ def do_experiment(rd_seed, experiment_models, train_embed=False):
     np.random.seed(rd_seed)
     for exp_model in experiment_models:
         # build a new tree lstm for feeding subtree
-        model = exp_model.modelclass(exp_model.parameters)
+        model = exp_model.modelclass(*exp_model.parameters)
         model = model.to(device)
         optimizer = optim.Adam(model.parameters(), lr=exp_model.lr)
         if exp_model.name.startswith('pt') or exp_model.name.endswith('lstm'):
@@ -201,9 +201,9 @@ def do_experiment(rd_seed, experiment_models, train_embed=False):
                 if not train_embed:
                     model.embed.weight.requires_grad = False
         
-        path_embed_string = "train_embed" if train_embed else "not_train_embed"
-        exp = Experiment(model, optimizer, exp_name='{}_rd_seed_{}_{}'.format(
-            n, rd_seed, path_embed_string), **exp_model.options)
+        path_embed_string = "_train_embed" if train_embed else ""
+        exp = Experiment(model, optimizer, exp_name='{}_rd_seed_{}{}'.format(
+            exp_model.name, rd_seed, path_embed_string), **exp_model.options)
         exp.train()
         yield exp
 
@@ -265,6 +265,31 @@ print(acc_table)
 print(sig_table)
 
 # %%
+!pip install pydrive
+from pydrive.auth import GoogleAuth
+from pydrive.drive import GoogleDrive
+from google.colab import auth
+from oauth2client.client import GoogleCredentials
+
+auth.authenticate_user()
+gauth = GoogleAuth()
+gauth.credentials = GoogleCredentials.get_application_default()
+drive = GoogleDrive(gauth)
+
+
+def load_shared_files():
+  file_id = "1az0y5LU2T7vrhc3AVpVgfZthp7kAJUqH"
+  files = drive.ListFile({'q': "'%s' in parents and trashed=false" % file_id}).GetList()
+  for f in files:
+    print('title: %s, id: %s' % (f['title'], f['id']))
+    fname = os.path.join('', f['title'])
+    print('downloading to {}'.format(fname))
+    f_ = drive.CreateFile({'id': f['id']})
+    f_.GetContentFile(fname)
+  
+load_shared_files()
+
+# %%
 from itertools import groupby
 
 def prep_bin(data, bin_size):
@@ -283,13 +308,13 @@ def split_data_on_sentlen(data, sent_len_split=20):
     result_l = []
     result_r = []
 
-    for example in sorted_data:
+    for example in data:
         if len(example.tokens) < sent_len_split:
             result_l.append(example)
         else:
             result_r.append(example)
     
-    return result_l, result_r
+    return [result_l, result_r]
 
 
 # BE SURE TO MAKE SURE TO COPY AL .ct files!
@@ -300,6 +325,7 @@ def sent_len_evaluate(model, data,  batch_fn=get_minibatch, bin_size=5 , prep_fn
         - Model: Trained Model
         - prep_fn: Method to turn Example into tensor
     """
+    set_trace()
     binned_data = split_data_on_sentlen(data, 20)
     results = []
 
@@ -313,6 +339,11 @@ def sent_len_evaluate(model, data,  batch_fn=get_minibatch, bin_size=5 , prep_fn
     # length
 
 # %%
-exp = next(do_experiment(7, models))
-exp.eval(eval_fn=sent_len_evaluate, batch_fn=get_minibatch,
-                    prep_fn=prepare_treelstm_minibatch)
+exp2 = next(do_experiment(7, models))
+# FOR TREE
+# exp.eval(eval_fn=sent_len_evaluate, batch_fn=get_minibatch,
+#                     prep_fn=prepare_treelstm_minibatch)
+
+# For MINI_LSTM
+exp2.eval(eval_fn=sent_len_evaluate, batch_fn=get_minibatch,
+                    prep_fn=prepare_minibatch)
