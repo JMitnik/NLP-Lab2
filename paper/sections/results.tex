@@ -1,17 +1,32 @@
 \section{Results and Analysis}
 \label{sec: results}
-Table \ref{table: results-acc} shows the accuracy for each model, averaged over
-three different runs, after prediction of the test-set. Table \ref{table: sign}
-reflects the significance of these predictions when compared to another model.
-The [conjunction] of these metrics makes it possible to answer a number of
-research questions. To answer the first question, how important word order is,
-one only has to look at the accuracy resutls of BOW
+Table \ref{table: results-acc} shows the accuracy on the testset for each model,
+averaged over three runs with different seeds. Several abbreviations
+clarification: DCBOW stands for Deep CBOW, DCBOW-PT stands for Deep CBOW with
+pretrained embedding, Mini-LSTM means vanilla LSTM trained with minibatch,
+T-LSTM stands for Tree-LSTM, and ST-LSTM is the tree LSTM trained with per-node
+supervision. \\ Table \ref{table: sign} reflects the significance of these
+predictions when compared to another model. The [conjunction] of these metrics
+makes it possible to answer a number of research questions. \\
+% \begin{enumerate}
+    \vspace{-10pt}
+    \subsection{How important is word order for the task of classification of
+    sentiment?} To answer this question, one only has to compare the accuracy
+    results of BOW-like models and vanilla LSTM. Note that most of the BOW
+    models are trained with random embedding initialization, except for
+    DCBOW-PT, so it is only fair to compare between DCBOW-PT with LSTM. And we
+    can see LSTM is about 3 persents over the DCBOW-PT, which is already a big
+    gap.
+    \subsection{Does tree structure improve the accuracy as opposed to
+    sequential learning?} 
+% \end{enumerate}
 
 \begin{table*}[]
     \centering
-    \begin{tabular}{lllllll}
-    BOW  & CBOW & Deep CBOW & LSTM & Mini LSTM & Tree LSTM & Subtree LSTM \\
-    0.13 & 0.19 & 0.28      & 0.43 & 0.46      & 0.47      & 0.45        
+    \small
+    \begin{tabular}{llllllll}
+    BOW  & CBOW & DCBOW & DCBOW-PT & LSTM & Mini-LSTM & T-LSTM & ST-LSTM \\
+    $0.19\pm .04$ & $0.28\pm .07$ & $0.25\pm .02$ & $0.44\pm .01$ & $0.47\pm .01$ & $0.46\pm .004$ & $0.47\pm .01$ & $0.45\pm .01$ 
     \end{tabular}
     \label{table: results-acc}
     \caption{Test-set accuracies of three models averaged over 3 seeds}
@@ -19,15 +34,18 @@ one only has to look at the accuracy resutls of BOW
 
 
 \begin{table*}[]
-    \begin{tabular}{llllllll}
-                     & BOW     & CBOW     & DCBOW     & LSTM    & Mini LSTM & Tree LSTM & Subtree LSTM \\
-        CBOW         & -        & -        & 0.63      & 1.13E-7 & 1.98E-23  & 2.77E-29  & 6.54E-20     \\
-        Deep CBOW    & 0.63     & 0.63     & -         & 0.001   & 1.22E-10  & 3.51E-15  & 1.38E-9      \\
-        LSTM         & 1.13E-7  & 1.13E-7  & 0.001     & -       & 0.008     & 0.0003    & 0.02         \\
-        Mini LSTM    & 1.97E-23 & 1.97E-23 & 1.21E-10  & 0.008   & -         & 0.34      & 0.73         \\
-        Tree LSTM    & 2.78E-29 & 2.78E-29 & 3.52E-15  & 0.0003  & 0.34      & -         & 0.18         \\
-        Subtree LSTM & 1.38E-9  & 6.54E-20 & 1.38E-9   & 0.019   & 0.72      & 0.18      & -           
+    \small
+    \begin{tabular}{lllllllll}
+                     & BOW     & CBOW     & DCBOW  & DCBOW-PT   & LSTM    &
+                     Mini-LSTM & T-LSTM & ST-LSTM \\
+        CBOW         & 0.18  &   -   & 0.015  & 0.048 &0.0075&8.2E-5 & 2.0E-6 &3.3E-10     \\
+        DCBOW    & 0.39   &  0.015   &  -    &  0.57  & 0.15  & 2.3E-3  & 4.0E-5 & 8.8E-9     \\
+        DCBOW-PT & 0.17  &   0.048  &   0.57  &   -  &  0.58 &  0.093  &   0.015  & 3.6E-4 \\
+        LSTM         & 2.1E-4 &  7.6E-3 &  0.15  &  0.58 & -  &  0.32  &  0.075  & 4.0E-3      \\
+        Mini-LSTM    & 1.6E-5 &  8.2E-5 &  2.4E-3  &  0.093  &  0.32  &   -    &    0.48   &  0.057     \\
+        T-LSTM    & 5.3-7  & 2.0E-6 & 4.0E-5 &  0.015  & 0.07  &   0.48   &    -    &   0.24     \\
+        ST-LSTM & 8.3-19  &  3.3-10  &  8.8-9  & 3.6E-4 & 4.0E-3 &  0.057   &    0.24   &   -       
         \end{tabular}
     \label{table: sign}
-    \caption{Significance of accuracy tests}
+    \caption{Significance of accuracy tests across all models.}
 \end{table*}
