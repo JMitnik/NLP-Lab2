@@ -1,12 +1,12 @@
 \section{Background}
 \label{sec: background}
 \subsubsection{Word Embeddings}
-Word embedding is a fundamental technique we need to represent words even
-sentences in an efficient way. The basic idea is to cast all words in the
-vocabulary to a low dimensional real space in a fashion that the more close two
-words semantically, the more close they are in terms of Euclidean distance in
-the embedding space. The most common way to build up an embedding is to use
-word2vec\cite{mikolov2013distributed} with the assumption that the semantic of
+Word embedding is a fundamental technique to represent words in an efficient
+way. The basic idea is to cast all words in the vocabulary to a low dimensional
+real space in a fashion that the more close two words semantically, the more
+close they are in terms of Euclidean distance in the embedding space. The most
+common way to build up an embedding is to use
+word2vec\cite{mikolov2013distributed} with the assumption that the semantics of
 one word is related to the neighbor word distribution. A similar approach that
 captures the distribution by count the co-occurrence globally called
 GloVe\cite{pennington2014glove} is used in this paper.
@@ -28,12 +28,12 @@ The Continuous bag of word (CBOW) model is an extension of the BOW by changing
 the dimensionality of each of the vectors it sums to an arbitrary size (here
 chosen to be 300) to house some semantic representation of each word.
 Furthermore, to ensure proper calculations, the model learns the corresponding
-mapping of these semantic representation to output classes by training a neural
+mapping of these semantic representations to output classes by training a neural
 network and learning a weight matrix, $W$. The model concludes by performing an
 affine transformation from $R^{300}$ to $R^D$.
 
-The Deep CBOW is a deeper extension on the CBOW matrix, and uses the benefit of
-multiple layers within its neural network's output to learn more information of
+The Deep CBOW is a deeper extension on the CBOW matrix and uses the benefit of
+multiple layers within its neural network's output to learn more information on
 these semantic representations during the forward pass of the neural network.
 Essentially, the matrix performs a linear transformation of the input
 ($R^{300}$) to a hidden layer size, which is in $R^{100}$. An activation
@@ -60,7 +60,7 @@ referred to as the vanishing gradient problem.
 Long-short term network (LSTM) models \cite{hochreiter1997long} were introduced
 in 1997, and added an additional cell state, $c_t$, to the core dynamics of the
 RNN. The idea of this cell-state is to counter this major problem of RNN's. An
-LSTM unit's cell state serves as long-term memory, and any operations on this
+LSTM unit's cell state serves as long-term memory, and any operation on this
 cell state is protected by gates. Each of these gates carefully regulates
 interactions with the cell states, such as updating or receiving information.
 For each unit in the network, a number of gates are traversed before calculating
@@ -89,7 +89,7 @@ unit cell additionally receives a previous memory cell. Instead of summing the
 previous hidden states beforehand, this variant does that in each gate with a
 weight matrix per assigned child. For instance, calculation of the input gate is
 altered to the form $i_j=\sigma(W^i*x_j +
-\sum\limits_{k=1}^{N}U_k^{i}h_{jl}+b^i)$. Kai et al states that this allows for
+\sum\limits_{k=1}^{N}U_k^{i}h_{jl}+b^i)$. Kai et al state that this allows for
 more granular calculations, which can result in even more fine-tuned results.
 Furthermore, forget gates are calculated per child, which means that each child
 has assigned a weight matrix to each other child, and thus can find interaction

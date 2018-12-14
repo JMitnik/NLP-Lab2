@@ -10,15 +10,22 @@ predictions when compared to another model. The [conjunction] of these metrics
 makes it possible to answer a number of research questions. \\
 % \begin{enumerate}
     \vspace{-10pt}
-    \subsection{How important is word order for the task of classification of
-    sentiment?} To answer this question, one only has to compare the accuracy
+    \subsection{How important is word order for the task of classification of sentiment?} To answer this question, one only has to compare the accuracy
     results of BOW-like models and vanilla LSTM. Note that most of the BOW
     models are trained with random embedding initialization, except for
-    DCBOW-PT, so it is only fair to compare between DCBOW-PT with LSTM. And we
-    can see LSTM is about 3 persents over the DCBOW-PT, which is already a big
-    gap.
+    DCBOW-PT, so it is only fair to compare DCBOW-PT with LSTM. And we
+    can see LSTM is about 3 percent over the DCBOW-PT, which is a big gap.
     \subsection{Does tree structure improve the accuracy as opposed to
-    sequential learning?} 
+    sequential learning?} We compare the accuracy of both T-LSTM with Mini-LSTM,
+    instead of vanilla LSTM, since T-LSTM is also trained in the minibatch way. The
+    mean of T-LSTM is over Mini-LSTM by 0.01, but considering the variance of both estimations, it is not sufficient to say tree structure brings a
+    performance boost. The significance test in Table \ref{table: sign} agrees
+    with this view.
+    \subsection{Performance on supervising sentiment per-node?} 
+    In opposite to our hypothesis, imposing supervision per-node on tree LSTM
+    results in worse result in terms of mean accuracy on test set. The ST-LSTM
+    performs worst among all LSTM models, and according to significance table,
+    the difference between ST-LSTM and T-LSTM is not statistically significant. It might result from the sparsity per batch and bad hyperparameters. However, we do observe less overfit in the training of ST-LSTM, suggesting adding per-node supervision might be a good regularizer.
 % \end{enumerate}
 
 \begin{table*}[]
