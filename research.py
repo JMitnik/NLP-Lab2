@@ -290,6 +290,52 @@ def load_shared_files():
 load_shared_files()
 
 # %%
+import pandas as pd
+
+def convert_df_to_example(df):
+  results = []
+
+  for i in list(df.iterrows()):
+    tokens, tree, label, transitions, _, _ = i[1]
+    results.append(Example(tokens, tree, label, transitions))
+  
+  return results
+
+def bin_data_set(data, bin_size=5):
+  df = pd.DataFrame(data)
+  df['length'] = df.apply(lambda x: len(x.tokens), axis=1)
+  df = df.sort_values('length')
+  df = df.iloc[:-1]
+
+  shortest_sent = df['length'].iloc[0]
+  longest_sent = df['length'].iloc[-1]
+  bins = pd.interval_range(shortest_sent - 1, longest_sent, freq=bin_size)
+  df['bins'] = pd.cut(df['length'], bins, include_lowest=True)
+  df = df.dropna()
+  
+  results = []
+  
+  for bin in df.bins.unique():
+    results.append(convert_df_to_example(df[df['bins'] == bin]))
+  
+  return results
+
+# %%
+# DEBUG
+bin_size=5
+test_df = pd.DataFrame(test_data)
+test_df['length'] = test_df.apply(lambda x: len(x.tokens), axis=1)
+test_df = test_df.sort_values('length')
+test_df = test_df.iloc[:-1]
+
+shortest_sent = test_df['length'].iloc[0]
+longest_sent = test_df['length'].iloc[-1]
+bins = pd.interval_range(shortest_sent - 1, longest_sent, closed="right", freq=bin_size)
+test_df['bins'] = pd.cut(test_df['length'], bins, include_lowest=True)
+test_df = test_df.dropna() # debug purposes
+
+test_df['length'].hist()
+# %%
 from itertools import groupby
 
 def prep_bin(data, bin_size):
@@ -316,8 +362,6 @@ def split_data_on_sentlen(data, sent_len_split=20):
     
     return [result_l, result_r]
 
-
-# BE SURE TO MAKE SURE TO COPY AL .ct files!
 # %%
 def sent_len_evaluate(model, data,  batch_fn=get_minibatch, bin_size=5 , prep_fn=prepare_minibatch, **kwargs):
     """Evaluates a model for different sentence sizes.
@@ -326,7 +370,7 @@ def sent_len_evaluate(model, data,  batch_fn=get_minibatch, bin_size=5 , prep_fn
         - prep_fn: Method to turn Example into tensor
     """
     set_trace()
-    binned_data = split_data_on_sentlen(data, 20)
+    binned_data = binned_data
     results = []
 
     for index, examples in enumerate(binned_data):
@@ -339,11 +383,18 @@ def sent_len_evaluate(model, data,  batch_fn=get_minibatch, bin_size=5 , prep_fn
     # length
 
 # %%
-exp2 = next(do_experiment(7, models))
-# FOR TREE
-# exp.eval(eval_fn=sent_len_evaluate, batch_fn=get_minibatch,
-#                     prep_fn=prepare_treelstm_minibatch)
+import seaborn as sns
 
-# For MINI_LSTM
-exp2.eval(eval_fn=sent_len_evaluate, batch_fn=get_minibatch,
-                    prep_fn=prepare_minibatch)
+def plot_sent_len_results(models, seed_li=[7]):
+  trained_experiments = list(do_experiment(1984, models))
+  plt.figure()
+  
+  for exp in trained_experiments:
+    prep_func = prepare_treelstm_minibatch if exp.model_name.startswith(
+                'tree') or exp.model_name.startswith('subtree') else prepare_minibatch
+    exp.eval(eval_fn=sent_len_evaluate, batch_fn=get_minibatch,
+                    prep_fn=prep_func)
+    plt.plot(exp.acc, label=exp.model_name)
+    plt.legend()
+
+plot_sent_len_results(models)
