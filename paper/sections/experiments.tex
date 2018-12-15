@@ -1,44 +1,54 @@
 \section{Experiments}
 \label{sec: experiments}
-The main goal of this research is to predict the sentiment of a corpus using
-different models. The dataset that this task uses is the Stanford Sentiment
-Treebank\cite{socher2013recursive}. This dataset consists of 10.662 excerpts
-from longer-form movie reviews. Over all the sentences, a total of 215.154
-annotated phrases can be found. Each of these reviews have an associated
-sentiment score from the originating review, and each of these phrases have an
-associated sentiment score through human annotation. As such, this dataset can
-capture a semblance of fine-grained sentiment per-phrase and per-sentence.
+The main task of this research is to do the sentiment prediction on sentence
+level given a train set. The dataset used is the Stanford Sentiment
+Treebank\cite{socher2013recursive}, which provides a collection of sentences,
+coupled tree structure and fine-grained sentiment scores for subtrees at each
+node.
+% This dataset consists of 10.662 excerpts
+% from longer-form movie reviews. Over all the sentences, a total of 215.154
+% annotated phrases can be found. 
+%  Each of these reviews have an associated
+% sentiment score from the originating review, and each of these phrases have an
+% associated sentiment score through human annotation. As such, this dataset can
+% capture a semblance of fine-grained sentiment per-phrase and per-sentence.
 
-Each model has been trained three times, each time under a different random
-seed. These seeds are 7, 42 and 1984. Table [x] represents the number of times
-each model is trained, as well as the learning rate of the optimizer and [number
-of parameters]. Most of the model will be initialized with pre-trained
-GloVe\cite{pennington2014glove} embedding vectors of size 300: those which
-don't, initialize their embedding vectors of size 300 from words in the corpus
-with weights set to arbitrary number. The pre-trained embeddings are furthermore
-set to fixed for the duration of the training.
-Adam\cite{DBLP:journals/corr/KingmaB14} is used to perform learning, with
-parameters being $\beta_{1}=0.9$ and $\beta_{2}=0.999$ and $eps=1e-08$. Adam is
-a variant on Stochastic Gradient Descent, which uses an exponential moving
-average of the gradient and squared gradient to control decay of each parameter.
-The loss function is the Cross Entropy Loss for each model.
+% To Jonathan: the supervision of this dataset could be illustrated more
+% accurately, and also we need to shrink down text, so I replace them with a
+% gist.
 
-During the training, a model is given a sentence with the corresponding label
-from the corpus. This label will be the truth value and used to supervise the
-model during training. Finally, the model performance will be evaluated using
-[accuracy], along with a significance test to compare which model performs
-better.
+Each model has been trained three times under different random seeds. These
+seeds are 7, 42 and 1984. Table [x] represents the number of times each model is
+trained, as well as the learning rate of the optimizer and [number of
+parameters]. Most of the model will have its embedding projector initialized
+with the pre-trained GloVe\cite{pennington2014glove} word embedding of size 300,
+without finetune. For other models we use Xavier initialization by default. Adam
+optimizer\cite{DBLP:journals/corr/KingmaB14} is used, with momentum parameters
+being $\beta_{1}=0.9$ and $\beta_{2}=0.999$ and $eps=1e-08$.
+%  Adam is a variant on Stochastic Gradient Descent, which uses an exponential moving
+% average of the gradient and squared gradient to control decay of each parameter.
+% The loss function is the Cross Entropy Loss for each model.
 
-For research question 3, an additional separate trial will be run to train
-Tree-LSTMs. The Tree-LSTM models are supervised per node, instead of on the root
-node. [This is done by extracting all subtrees using an external algorithm
-written for this purpose.]
+% During the training, a model is given a sentence with the corresponding label
+% from the corpus. This label will be the truth value and used to supervise the
+% model during training.  
+In almost all the models we use the label at the root node as the supervision to
+entire sentence. Only in Subtree-LSTM we supervise every subtree with the root
+node of itself, by augmenting the original dataset with all extracted subtrees.
+In the test phase, the model performance will be evaluated using [accuracy],
+along with a significance test to determine whether the difference is
+statistically significant.
+
+% For research question 3, an additional separate trial will be run to train
+% Tree-LSTMs.
+%  The Tree-LSTM models are supervised per node, instead of on the root
+% node. [This is done by extracting all subtrees using an external algorithm
+% written for this purpose.]
 % TODO: Gongze, do we reference this library, or deny its existence and just 
 % assume they believe us?
 
-For research question 4, each of the examples in the test-set will be grouped by
-the number of tokens inside the sentence. The test-set is fragmented in groups
-of range 5, e.g. sentences of length 1-5, 5-10, and so on. Each model will then
-calculate results for each of these bins.
+For research question 4, we put the test-set into a number of bins of size 5,
+according to their length of range 5, e.g. sentences of length 1-5, 5-10, and so
+on. We report the accuracy of each model on every bin and plot them in one figure.
 
 % TODO: Anymore experiments can go here.
