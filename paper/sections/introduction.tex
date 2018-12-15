@@ -12,64 +12,49 @@ model to make wrong inferences based on ignored negations. For this reason, it
 is the goal of this paper to investigate the role of such dependencies. The
 paper will investigate the importance of word order and context by studying a
 number of different models, each varying in how granular information is parsed.
-% TODO: Reflow the bracketed text
-\begin{enumerate}
-    \item \textbf{How important is word order for the task of classification of
-    sentiment?} Some models, such as the traditional Bag of Words, disregard
-    word order in favour of a simpler vector representation of the underlying
-    text. Long short-term memory (LSTM), a more recent variant on the Recurrent
-    Neural Network, maintains a memory state of recent words encountered to
-    incorporate word-order of short and long distances. This paper initially
-    believes that models which maintain and understand word-order will perform
-    better. 
-    % TODO: Do something about the findings
-    \item \textbf{Does tree structure improve the accuracy as opposed to
-    sequential learning?} Vanilla LSTM as originally introduced, behaves in a
-    sequential manner. One alternative to LSTM proposed was Tree LSTM, which can
-    use multiple prior cells to infer the state of the current word, [enhancing
-    the context available for the model]. The paper seeks to investigate whether
-    adding these additional precursor cells for each prediction, will actually
-    increase performance of the inference on the testing. The original belief is
-    that this will certainly be the case, and as the results suggest, this
-    [seems to be case].
-    % TODO: Add cite for sequential introduction TODO: Add cite for tree
-    % introduction TODO: Reflow bracketed text. TODO: Is this significant?
-    \item \textbf{Performance on supervising sentiment per node?}
-    % This paper is seeking to investigate if the Tree LSTM algorithm should be
-    % trained on the supervision of the sentiment of individual words, or on the
-    % sentiment of the sentences altogether. 
+
+    \textit{1. How important is word order for the task of classification of
+    sentiment?} Some models, such as the traditional Bag of Words, do not
+    capture word order. Long short-term memory networks (LSTM), maintain a
+    memory state of recent words encountered to incorporate word-order of short
+    and long distances. This paper initially believes that models which maintain
+    and understand word-order will perform better. Findings suggest (\ref{sec:
+    results}) that this is indeed the case, significantly enough.
+
+    \textit{2. Does tree structure improve the accuracy as opposed to
+    sequential learning?} LSTM as originally
+    introduced \cite{hochreiter1997long}, behaves in a sequential manner. One
+    alternative to LSTM proposed was Tree LSTM, which can use multiple prior
+    cells to infer more about about a word's current context. The paper seeks to
+    investigate whether adding these additional precursor cells for each
+    prediction, will increase performance of the inference on the testing. The
+    original belief is that this will be the case, however, findings suggest no
+    significant difference between these models.
+    
+    \textit{3. Performance on supervising sentiment per node?}
     This paper is seeking to investigate whether adding additional supervision
     on intermediate words or phrases will help the model capture the more
-    context-related sentiment. The initial hypothesis of this paper argues that
-    the supervision of individual nodes might decrease performance, due to less
-    context to account for negating sentiment, for instance.
-    % TODO: @Gongze, do you agree with the above initial hypothesis and
-    % reasoning? ||| I want to add that the supervision is acted upon not only
-    % word level, rather on a phrase level. And also the later result might
-    % suggest a neutral effect of adding supervision, that is, no big gap
-    % between these two cases. I suspect its because we dont train it with proper
-    % learning rate or not until they converge. |||TODO: Incorporate later
-    % results.
-    \item \textbf{Will the performance vary much on different sentence length across models?}
-    % A model's performance might depend on how many words the model needs to keep
-    % in store. Decreasing the sentence length might show the difference in model
-    % performance, and which model relatively performs better with longer
-    % sentences. Initially, this paper argues that Tree LSTM might perform the
-    % best, as it has more cells to infer relevant knowledge from than regular
-    % LSTM. 
+    context-related sentiment for Tree LSTMS. The initial hypothesis of this
+    paper argues that the supervision of individual nodes might decrease
+    performance, due to less context to account for negating sentiment, for
+    instance. Later findings suggest no significant difference when supervising
+    per node.
+
+    \textit{4. Will the performance vary much on different sentence length across models?}
     A model may behave very differently to sentences of different length,
-    because for longer sentences the sentiment semantics is more complex and
-    sometimes contradict itself in different parts. So it is a crucial problem
-    whether a model performs evenly on different length sentences and whether
-    some model performs better on capturing sentiments contexts in longer time
-    scale. Initially, this paper argues that Tree LSTM might perform the best,
-    as it process the context in a hand-crafted structural way, thus more
-    efficient when dealing with long-scale semantics.
-    % TODO: @Gongze, do you agree with the initial hypothesis? TODO: Add results
-    % Might have inproper grammar and usage of word.
-    \item \textbf{How does N-ary Tree LSTM compare to the Child-Sum Tree LSTM?}
+    because for longer sentences the semantics can be more complex and seeming
+    contradictions may be found. The performance of models on long and short
+    sentences should be investigated. Initially, this paper argues that Tree
+    LSTM might perform the best, as it process the context in a hand-crafted
+    structural way, and thus more efficient when dealing with long-scale
+    semantics. However, [while the eventual findings suggest Trees to perform
+    best, no models performs singificantly higher].
+
+    % TODO:@Gongze Maybe we should phrase the question more simple here, and
+    % then answer them more fully in background for instance?
+    \textit{5. How does N-ary Tree LSTM compare to the Child-Sum Tree LSTM?}
     The N-ary tree-LSTM differs with Child-sum tree-LSTM in that the latter is
-    [agnostic] of the order of the child nodes. On implementation details, the
+    [agnostic of the order of the child nodes. On implementation details, the
     N-ary tree-LSTM has different gate parameter for each child, while Child-sum
     use the same parameter for all the gate including forget gate. In most
     cases, N-ary tree-LSTM first project then sum, while the Child-sum tree-LSTM
@@ -78,10 +63,8 @@ number of different models, each varying in how granular information is parsed.
     Child-sum tree-LSTM should work well on the order of child nodes does not
     contribute to the context. In the sentiment classification task, we need
     N-ary tree-LSTM since the word order is important to context extraction.
-\end{enumerate}
+% \end{enumerate}
 
-In order to do so, the different models mentioned will be initialized with
+During investigation the different models mentioned will be initialized with
 300-dimensional GloVe\cite{pennington2014glove} vectors. The goal is to predict
-the sentiment of [Stanford Sentiment Treebank data], with the different settings
-corresponding to the [aforementioned research questions].
-% SST doesn't have a paper to cite, weird.
+the sentiment of Stanford Sentiment Treebank data \cite{socher2013recursive}.
