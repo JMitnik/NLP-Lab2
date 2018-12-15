@@ -1759,7 +1759,7 @@ class ChildSumTreeLSTMCell(nn.Module):
 
   def __init__(self, input_size, hidden_size, bias=True):
     """Creates the weights for this LSTM"""
-    super(TreeLSTMCell, self).__init__()
+    super(ChildSumTreeLSTMCell, self).__init__()
 
     self.input_size = input_size
     self.hidden_size = hidden_size
@@ -1791,7 +1791,7 @@ class ChildSumTreeLSTMCell(nn.Module):
     # you can also project from them separately and then sum
     children_sum = prev_h_l+prev_h_r
     children = torch.cat([prev_h_l, prev_h_r], dim=0)
-    f_l, f_r = torch.chunk(self.forget_layer(forget_layer), 2, dim=0)
+    f_l, f_r = torch.chunk(self.forget_layer(children), 2, dim=0)
     
     # project the combined children into a 5D tensor for i,fl,fr,g,o
     # this is done for speed, and you could also do it separately
