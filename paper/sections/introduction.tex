@@ -3,18 +3,15 @@
 \label{sec: intro}
 Sentiment analysis is a sub-domain within the field of Natural Language
 Processing, in which an statistical model infers the direction and magnitude of
-emotions from certain corpora. Language representation plays an important role
-in the sentiment inference of unseen text. Successful inference depends on
-deciding appropriate language models which can model the structural dependencies
-within the sentences of a language sufficiently. One such structural dependency
-is word order. Another complicated aspect of inference is sufficient context
-when presented with data to predict or train on: for instance, if the model has
-been trained on partial phrases, it might become easier for the model to make
-wrong inferences based on non-negated sentiments. For this reason, it is the
-goal of this paper to investigate the role of these dependencies.
-
-This paper will attempt to answer some of the questions corresponding to the
-[data by examining a number of different research questions.]
+emotions from text. Successful inference depends on building appropriate
+language models which can model the structural dependencies and semantics within
+the sentences of a language sufficiently. Context and word order are [relevant]
+to capturing a word or phrase's semantic representation. For instance if the
+model has been trained on partial phrases, it could become more common for the
+model to make wrong inferences based on ignored negations. For this reason, it
+is the goal of this paper to investigate the role of such dependencies. The
+paper will investigate the importance of word order and context by studying a
+number of different models, each varying in how granular information is parsed.
 % TODO: Reflow the bracketed text
 \begin{enumerate}
     \item \textbf{How important is word order for the task of classification of
@@ -83,7 +80,6 @@ This paper will attempt to answer some of the questions corresponding to the
     N-ary tree-LSTM since the word order is important to context extraction.
 \end{enumerate}
 
-% TODO: Add citation for Glove
 In order to do so, the different models mentioned will be initialized with
 300-dimensional GloVe\cite{pennington2014glove} vectors. The goal is to predict
 the sentiment of [Stanford Sentiment Treebank data], with the different settings
