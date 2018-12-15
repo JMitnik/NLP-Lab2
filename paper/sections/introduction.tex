@@ -2,18 +2,19 @@
 % Pages-size: 1
 \label{sec: intro}
 Sentiment analysis is a sub-domain within the field of Natural Language
-Processing, in which an statistical model infers the direction and magnitude of
+Processing, in which a statistical model infers the direction and magnitude of
 emotions from certain corpora. Language representation plays an important role
 in the sentiment inference of unseen text. Successful inference depends on
 deciding appropriate language models which can model the structural dependencies
-within the sentences of a language sufficiently. One such structural dependency
-is word order. Another complicated aspect of inference is sufficient context
-when presented with data to predict or train on: for instance, if the model has
-been trained on partial phrases, it might become easier for the model to make
-wrong inferences based on non-negated sentiments. For this reason, it is the
-goal of this paper to investigate the role of these dependencies.
+efficiently. One such structural dependency is word order. Another complicated
+aspect of inference is sufficient context when presented with data to predict or
+train on: for instance, if the model has been trained on partial phrases, it
+might become easier for the model to make wrong inferences based on non-negated
+sentiments. For this reason, it is the goal of this paper to investigate the
+role of these dependencies.
+% To Jonathan: Is the last obstacle to inference the imbalance between class? If yes, did we do an investigation on this phenomenon in this paper?
 
-This paper will attempt to answer some of the questions corresponding to the
+This paper will attempt to answer the questions below corresponding to the
 [data by examining a number of different research questions.]
 % TODO: Reflow the bracketed text
 \begin{enumerate}
@@ -27,14 +28,14 @@ This paper will attempt to answer some of the questions corresponding to the
     better. 
     % TODO: Do something about the findings
     \item \textbf{Does tree structure improve the accuracy as opposed to
-    sequential learning?} Vanilla LSTM as originally introduced, behaves in a
-    sequential manner. One alternative to LSTM proposed was Tree LSTM, which can
-    use multiple prior cells to infer the state of the current word, [enhancing
-    the context available for the model]. The paper seeks to investigate whether
-    adding these additional precursor cells for each prediction, will actually
-    increase performance of the inference on the testing. The original belief is
-    that this will certainly be the case, and as the results suggest, this
-    [seems to be case].
+    sequential learning?} Vanilla LSTM as originally introduced, takes in words
+    in a sequential manner. One alternative to LSTM is Tree LSTM, which can tree
+    structure to obtain phrase representation both globally and locally,
+    [enhancing the context available for the model]. The paper seeks to
+    investigate whether aggregating context structurally will increase the
+    performance of the inference on the test set. The original belief is that
+    this will certainly be the case, and as the results suggest, this [seems to
+    be the case].
     % TODO: Add cite for sequential introduction TODO: Add cite for tree
     % introduction TODO: Reflow bracketed text. TODO: Is this significant?
     \item \textbf{Performance on supervising sentiment per node?}
@@ -50,9 +51,9 @@ This paper will attempt to answer some of the questions corresponding to the
     % reasoning? ||| I want to add that the supervision is acted upon not only
     % word level, rather on a phrase level. And also the later result might
     % suggest a neutral effect of adding supervision, that is, no big gap
-    % between these two cases. I suspect its because we dont train it with proper
-    % learning rate or not until they converge. |||TODO: Incorporate later
-    % results.
+    % between these two cases. I suspect it because we don't train it with
+    % proper learning rate or not until they converge. |||TODO: Incorporate
+    % later results.
     \item \textbf{Will the performance vary much on different sentence length across models?}
     % A model's performance might depend on how many words the model needs to keep
     % in store. Decreasing the sentence length might show the difference in model
@@ -60,23 +61,25 @@ This paper will attempt to answer some of the questions corresponding to the
     % sentences. Initially, this paper argues that Tree LSTM might perform the
     % best, as it has more cells to infer relevant knowledge from than regular
     % LSTM. 
-    A model may behave very differently to sentences of different length,
-    because for longer sentences the sentiment semantics is more complex and
-    sometimes contradict itself in different parts. So it is a crucial problem
-    whether a model performs evenly on different length sentences and whether
-    some model performs better on capturing sentiments contexts in longer time
-    scale. Initially, this paper argues that Tree LSTM might perform the best,
-    as it process the context in a hand-crafted structural way, thus more
-    efficient when dealing with long-scale semantics.
+    A model may behave very differently to sentences of different length. On one
+    hand, it is because for longer sentences the sentiment semantics is more
+    complex and sometimes contradict itself in different parts, on the other
+    hand, it is due to the imbalanced distribution of sentences of different
+    length in the train set. Therefore it is a crucial problem whether a model
+    performs evenly on different length sentences and whether some model
+    performs better on capturing sentiments contexts in longer timescale.
+    Initially, this paper argues that Tree LSTM might perform the best, as it
+    processes the context in a hand-crafted structural way, thus more efficient
+    when dealing with long-scale semantics.
     % TODO: @Gongze, do you agree with the initial hypothesis? TODO: Add results
-    % Might have inproper grammar and usage of word.
+    % Might have improper grammar and usage of word.
     \item \textbf{How does N-ary Tree LSTM compare to the Child-Sum Tree LSTM?}
     The N-ary tree-LSTM differs with Child-sum tree-LSTM in that the latter is
     [agnostic] of the order of the child nodes. On implementation details, the
     N-ary tree-LSTM has different gate parameter for each child, while Child-sum
     use the same parameter for all the gate including forget gate. In most
     cases, N-ary tree-LSTM first project then sum, while the Child-sum tree-LSTM
-    do the opposite. Hence they are suitable to different tasks: the N-ary
+    do the opposite. Hence they are suitable for different tasks: the N-ary
     tree-LSTM is suitable to those trees where child nodes are ordered, and the
     Child-sum tree-LSTM should work well on the order of child nodes does not
     contribute to the context. In the sentiment classification task, we need
@@ -84,8 +87,9 @@ This paper will attempt to answer some of the questions corresponding to the
 \end{enumerate}
 
 % TODO: Add citation for Glove
-In order to do so, the different models mentioned will be initialized with
-300-dimensional GloVe\cite{pennington2014glove} vectors. The goal is to predict
-the sentiment of [Stanford Sentiment Treebank data], with the different settings
-corresponding to the [aforementioned research questions].
+% To Jonathan: is this paragraph necessary there? Because we will touch these in details soon. Maybe we should mention our findings briefly.
+In order to address these questions above, the different models mentioned will
+be initialized with 300-dimensional GloVe\cite{pennington2014glove} vectors. The
+goal is to predict the sentiment of [Stanford Sentiment Treebank data], with the
+different settings corresponding to the [aforementioned research questions].
 % SST doesn't have a paper to cite, weird.
