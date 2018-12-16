@@ -44,7 +44,7 @@ calculates the actual candidate selection of the input, by $C_t = tanh(W_c *
 [h_{t-1}, x_t] + b_c)$. These two can then be implemented to change the value of
 the cell state. The cell state is then finally accessed by an output gate, $o_t
 = \sigma(W_o * [h_{t-1}, x_t] + b_o)$, and multiplied by the tanh of the
-candidates, to calculate the new hidden state.
+candidates, to calculate the new hidden state. 
 
 
 
