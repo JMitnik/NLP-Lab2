@@ -5,13 +5,16 @@ Sentiment analysis is a sub-domain within the field of Natural Language
 Processing, in which an statistical model infers the direction and magnitude of
 emotions from text. Successful inference depends on building appropriate
 language models which can model the structural dependencies and semantics within
-the sentences of a language sufficiently. Context and word order are [relevant]
-to capturing a word or phrase's semantic representation. For instance if the
-model has been trained on partial phrases, it could become more common for the
-model to make wrong inferences based on ignored negations. For this reason, it
-is the goal of this paper to investigate the role of such dependencies. The
-paper will investigate the importance of word order and context by studying a
-number of different models, each varying in how granular information is parsed.
+the sentences of a language efficiently. One such structural dependency is word
+order. Another complicated aspect of inference is sufficient context when
+presented with data to predict or train on: for instance, if the model has been
+trained on partial phrases, it might become easier for the model to make wrong
+inferences based on non-negated sentiments. For this reason, it is the goal of
+this paper to investigate the role of these dependencies. The paper will
+investigate the importance of word order and context by studying a number of
+different models, each varying in how granular information is parsed.
+% To Jonathan: Is the last obstacle to inference the imbalance between class? If
+% yes, did we do an investigation on this phenomenon in this paper?
 
     \textit{1. How important is word order for the task of classification of
     sentiment?} Some models, such as the traditional Bag of Words, do not
@@ -19,52 +22,44 @@ number of different models, each varying in how granular information is parsed.
     memory state of recent words encountered to incorporate word-order of short
     and long distances. This paper initially believes that models which maintain
     and understand word-order will perform better. Findings suggest (\ref{sec:
-    results}) that this is indeed the case, significantly enough.
+    results}) that including word-order improves performance significantly.
 
-    \textit{2. Does tree structure improve the accuracy as opposed to
-    sequential learning?} LSTM as originally
-    introduced \cite{hochreiter1997long}, behaves in a sequential manner. One
-    alternative to LSTM proposed was Tree LSTM, which can use multiple prior
-    cells to infer more about about a word's current context. The paper seeks to
-    investigate whether adding these additional precursor cells for each
-    prediction, will increase performance of the inference on the testing. The
-    original belief is that this will be the case, however, findings suggest no
-    significant difference between these models.
+    \textit{2. Does tree structure improve the accuracy as opposed to sequential
+    learning?} Vanilla LSTM takes in words in a sequential manner. One
+    alternative to LSTM is Tree LSTM, which uses a tree structure to obtain
+    phrase representation both globally and locally, to enhance the context
+    available for the model. This paper seeks to investigate whether aggregating
+    context structurally will increase the performance of the inference on the
+    test set. The original belief is that this is be the case, but final results
+    indicate no significant difference between LSTM and Tree LSTM.
     
     \textit{3. Performance on supervising sentiment per node?}
     This paper is seeking to investigate whether adding additional supervision
     on intermediate words or phrases will help the model capture the more
-    context-related sentiment for Tree LSTMS. The initial hypothesis of this
-    paper argues that the supervision of individual nodes might decrease
-    performance, due to less context to account for negating sentiment, for
-    instance. Later findings suggest no significant difference when supervising
-    per node.
+    context-related sentiment. The initial hypothesis of this paper argues that the
+    supervision of individual nodes might decrease performance, due to less context
+    to account for negating sentiment, for instance.Later findings suggest no
+    significant difference when supervising per node.
 
     \textit{4. Will the performance vary much on different sentence length across models?}
-    A model may behave very differently to sentences of different length,
-    because for longer sentences the semantics can be more complex and seeming
-    contradictions may be found. The performance of models on long and short
-    sentences should be investigated. Initially, this paper argues that Tree
-    LSTM might perform the best, as it process the context in a hand-crafted
-    structural way, and thus more efficient when dealing with long-scale
-    semantics. However, [while the eventual findings suggest Trees to perform
-    best, no models performs singificantly higher].
+    A model may behave very differently to sentences of different ranges of
+    length, due to a higher probability of encountering sentiment contradictions
+    in longer sentences, and class imbalances on the sentence-length in the
+    training-set.  Therefore it is a crucial problem whether a model performs
+    evenly on different length sentences and whether some model performs better
+    on capturing sentiments contexts in longer timescale. Initially, this paper
+    argues that Tree LSTM might perform the best, as it processes the context in
+    a hand-crafted structural way, thus more efficient when dealing with
+    long-scale semantics.
 
-    % TODO:@Gongze Maybe we should phrase the question more simple here, and
-    % then answer them more fully in background for instance?
     \textit{5. How does N-ary Tree LSTM compare to the Child-Sum Tree LSTM?}
     The N-ary tree-LSTM differs with Child-sum tree-LSTM in that the latter is
     [agnostic of the order of the child nodes. On implementation details, the
     N-ary tree-LSTM has different gate parameter for each child, while Child-sum
     use the same parameter for all the gate including forget gate. In most
     cases, N-ary tree-LSTM first project then sum, while the Child-sum tree-LSTM
-    do the opposite. Hence they are suitable to different tasks: the N-ary
+    do the opposite. Hence they are suitable for different tasks: the N-ary
     tree-LSTM is suitable to those trees where child nodes are ordered, and the
     Child-sum tree-LSTM should work well on the order of child nodes does not
     contribute to the context. In the sentiment classification task, we need
     N-ary tree-LSTM since the word order is important to context extraction.
-% \end{enumerate}
-
-During investigation the different models mentioned will be initialized with
-300-dimensional GloVe\cite{pennington2014glove} vectors. The goal is to predict
-the sentiment of Stanford Sentiment Treebank data \cite{socher2013recursive}.
