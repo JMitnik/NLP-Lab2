@@ -2,19 +2,16 @@
 % Pages-size: 1
 \label{sec: intro}
 Sentiment analysis is a sub-domain within the field of Natural Language
-Processing, in which an statistical model infers the direction and magnitude of
+Processing, in which a statistical model infers the direction and magnitude of
 emotions from text. Successful inference depends on building appropriate
 language models which can model the structural dependencies and semantics within
 the sentences of a language efficiently. One such structural dependency is the
-context of a word. Context is derived from factors such as word order, or even
+context of a phrase. Context is derived from factors such as word order, or even
 the granularity of how much data the model has been trained on. Insufficient
-context might lead to not noticing negations, for instances. For this reason, it
-is the goal of this paper to investigate the role of representations of context,
-The paper will investigate the importance of word order and data granularity by
-studying a number of different models, each varying in how granular information
-is parsed.
-% To Jonathan: Is the last obstacle to 
-% yes, did we do an investigation on this phenomenon in this paper?
+context might lead to not learning negations, for instances. The goal of this
+paper is to investigate the role of representations of context. The importance
+of word order and data granularity will be investigated by studying a number of
+different models, each varying in how granular information is parsed.
 
     \textit{1. How important is word order for the task of classification of
     sentiment?} Some models, such as the traditional Bag of Words, do not
@@ -38,7 +35,7 @@ is parsed.
     on intermediate words or phrases will help the model capture the more
     context-related sentiment. The initial hypothesis of this paper argues that the
     supervision of individual nodes might decrease performance, due to less context
-    to account for negating sentiment, for instance.Later findings suggest no
+    to account for negating sentiment, for instance. Later findings suggest no
     significant difference when supervising per node.
 
     \textit{4. Will the performance vary much on different sentence length across models?}
