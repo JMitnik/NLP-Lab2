@@ -11,14 +11,28 @@ one word is related to the neighbor word distribution. A similar approach that
 captures the distribution by count the co-occurrence globally called
 GloVe\cite{pennington2014glove} is used in this paper.
 
+
 \subsubsection{CBOW and Deep CBOW}
+One simple language model used in the literature is the Bag of Words model,
+which uses
+% Include source for perceptron
 The bag of words (BOW) model uses maximum likelihood to predict the most likely
-sentiment class by summing vectors of size $R^{D}$, where D is the number of
-sentiment labels. The BOW bases its likelihoods on the count of each word,
-[class-likelihoods, $p(label|word)$]. After summation, the label with the
-maximum likelihood is taken as the prediction. The simplicity of the algorithm
-has as consequence that no word-order is being memorized, and thus loses the
-predictive meaning of the context this implies.
+sentiment class by summing vectors of size $R^{D}$, . The BOW bases its
+likelihoods on the count of each word, [class-likelihoods, $p(label|word)$].
+After summation, the label with the maximum likelihood is taken as the
+prediction. The simplicity of the algorithm has as consequence that no
+word-order is being memorized, and thus loses the predictive meaning of the
+context this implies.
+
+% Add somewhere
+
+This perceptron,
+and any following Mutli-Layer Perceptrons are built using PyTorch, which is able
+to perform automatic differentiation\cite{paszke2017automatic} to calculate the
+gradients which the perceptron can use.
+
+
+% Add somewhere end
 
 \begin{align*}
     \hat{y} = \operatorname*{arg\,max}_{label} \sum^{N}_{i=0} log p(label|i)
@@ -35,17 +49,14 @@ affine transformation from $R^{300}$ to $R^D$.
 The Deep CBOW is a deeper extension on the CBOW matrix and uses the benefit of
 multiple layers within its neural network's output to learn more information on
 these semantic representations during the forward pass of the neural network.
-Essentially, the matrix performs a linear transformation of the input
-($R^{300}$) to a hidden layer size, which is in $R^{100}$. An activation
-function using the hyperbolic tangent (tanh) ensures non-linearity. After
-another linear transformation to the same $R^{100}$ and another tanh, the model
-maps these results to $R^D$ similarly to how CBOW did this. 
+Essentially,  similarly to how CBOW did this. 
 
 % TODO: Does this fit here, or in models, or something?
 % TODO: Decide if we need some source for this one?
 % TODO: Add citation
 
 \subsubsection{RNN and LSTM}
+RNN
 When parsing sentences of arbitrary lengths, and attempting some inference based
 on these sentences, Recurrent Neural Networks (RNNs) can [interpret] this
 sequential data by learning a number of weights matrices. RNNs consist of unit
@@ -63,16 +74,6 @@ RNN. The idea of this cell-state is to counter this major problem of RNN's. An
 LSTM unit's cell state serves as long-term memory, and any operation on this
 cell state is protected by gates. Each of these gates carefully regulates
 interactions with the cell states, such as updating or receiving information.
-For each unit in the network, a number of gates are traversed before calculating
-$h_t$. Firstly, the forget gate $f_t$ is responsible for deciding how much of
-$h_{t-1}$ is stored in the cell state by performing the calculation $f_t =
-\sigma(W_f * [h_{t-1}, x_t] + b_f)$. Next, the input gate decides how much of
-each value of the cell state to update, $i_t = \sigma(W_i * [h_{t-1}, x_t] +
-b_i)$. An intermediate step calculates the actual candidate selection of the
-input, by $C_t = tanh(W_c * [h_{t-1}, x_t] + b_c)$. These two can then be
-implemented to change the value of the cell state. The cell state is then
-finally accessed by an output gate, $o_t = \sigma(W_o * [h_{t-1}, x_t] + b_o)$,
-and multiplied by the tanh of the candidates, to calculate the new hidden state.
 Via this construction of gate access, the vanishing gradient problem is
 minimized.
 \subsubsection{Tree LSTM}
@@ -84,13 +85,13 @@ al] suggest two variants on how these child cells can be implemented: Child-Sum
 Tree LSTMs and N-Ary Trees. For a Child-sum LSTM cell, a summation of all hidden
 k hidden states is calculated. Each gate vector in this variant is calculated
 similarly to regular LSTMs, except the LSTM stores an additional weight matrix
-per gate for how to incorporate all the previous solutions. For N-Ary trees, a
-unit cell additionally receives a previous memory cell. Instead of summing the
-previous hidden states beforehand, this variant does that in each gate with a
-weight matrix per assigned child. For instance, calculation of the input gate is
-altered to the form $i_j=\sigma(W^i*x_j +
-\sum\limits_{k=1}^{N}U_k^{i}h_{jl}+b^i)$. Kai et al state that this allows for
-more granular calculations, which can result in even more fine-tuned results.
-Furthermore, forget gates are calculated per child, which means that each child
-has assigned a weight matrix to each other child, and thus can find interaction
-via their parent. 
+per gate for how to incorporate all the previous solutions, and order of
+children is not deemed important. For N-Ary trees, a unit cell additionally
+receives a previous memory cell. Instead of summing the previous hidden states
+beforehand, this variant does that in each gate with a weight matrix per
+assigned child. For instance, calculation of the input gate is altered to the
+form $i_j=\sigma(W^i*x_j + \sum\limits_{k=1}^{N}U_k^{i}h_{jl}+b^i)$. Kai et al
+state that this allows for more granular calculations, which can result in even
+more fine-tuned results. Furthermore, forget gates are calculated per child,
+which means that each child has assigned a weight matrix to each other child,
+and thus can find interaction via their parent. 

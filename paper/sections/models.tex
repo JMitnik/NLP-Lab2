@@ -1,5 +1,46 @@
 \section{Models}
 \label{sec: models}
+\subsection{BOW, CBOW and Deep CBOW}
+The BOW sums vectors of size $R^{D}$, where D is the number of sentiment labels,
+from very negative to very positive. D is 5 in this paper. For each word, an
+index of D represents the likelihoods $p(label|word)$ for each label based on
+word-count in training, and after summing these likelihood vectors for each
+word, the label with the highest likelihood is the eventual prediction. The CBOW
+sums vectors of a dimension 300, which is an arbitrary size to represent some
+semantical learnable properties of a word. The CBOW uses a perceptron by
+performing an affine transformation to the D-dimensional output, which
+corresponds to the output label. Deep CBOW is an extension to this technique,
+and converts the single-layer perceptron to a multi-layer perceptron. The model
+performs a linear transformation of the input ($R^{300}$) to a hidden layer
+size, which is in $R^{100}$. An activation function using the hyperbolic tangent
+(tanh) ensures non-linearity. After another linear transformation to the same
+$R^{100}$ and another tanh, the model maps these results to $R^D$.
+\subsubsection{LSTM and Tree LSTM}
+The LSTM and N-Ary Tree LSTM Architecture are similar in that their calculations
+mostly consist of the same steps. Initially, upon receiving an input in time the
+forget gate $f_t$ is responsible for deciding how much of $h_{t-1}$ is stored in
+the cell state. For Tree SLTM by performing the calculation $f_t = \sigma(W_f * [h_{t-1}, x_t]
++ b_f)$. Next, the input gate decides how much of each value of the cell state
+to update, $i_t = \sigma(W_i * [h_{t-1}, x_t] + b_i)$. An intermediate step
+calculates the actual candidate selection of the input, by $C_t = tanh(W_c *
+[h_{t-1}, x_t] + b_c)$. These two can then be implemented to change the value of
+the cell state. The cell state is then finally accessed by an output gate, $o_t
+= \sigma(W_o * [h_{t-1}, x_t] + b_o)$, and multiplied by the tanh of the
+candidates, to calculate the new hidden state.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 \begin{table*}[t]
     \centering
