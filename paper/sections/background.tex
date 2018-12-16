@@ -5,12 +5,11 @@
 Word embedding is a fundamental technique to represent words in an efficient
 way. The basic idea is to cast all words in the vocabulary to a low dimensional
 real space in a fashion that the more close two words semantically, the more
-close they are in terms of Euclidean distance in the embedding space. The most
-common way to build up an embedding is to use
-word2vec\cite{mikolov2013distributed} with the assumption that the semantics of
-one word is related to the neighbor word distribution. A similar approach that
-captures the distribution by count the co-occurrence globally called
-GloVe\cite{pennington2014glove} is used in this paper.
+close they are in terms of Euclidean distance in the embedding space. There are
+several embedding types such as word2vec\cite{mikolov2013distributed} and
+GloVe\cite{pennington2014glove}, all based on estimating the neighbor words
+distribution. We use GloVe in this paper.
+ 
 
 \subsubsection{BOW, CBOW and Deep CBOW}
 The bag of words (BOW) model uses maximum likelihood to predict the most likely
