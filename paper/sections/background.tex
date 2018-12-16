@@ -10,7 +10,6 @@ several embedding types such as word2vec\cite{mikolov2013distributed} and
 GloVe\cite{pennington2014glove}, all based on estimating the neighbor words
 distribution. We use GloVe in this paper.
  
-
 \subsubsection{BOW, CBOW and Deep CBOW}
 The bag of words (BOW) model uses maximum likelihood to predict the most likely
 sentiment class. This language model has no representation of word-order and
@@ -18,52 +17,40 @@ thus has been considered a simple but not sufficient representation to
 effectively capture word-order. The Continuous bag of word (CBOW)
 model\cite{DBLP:journals/corr/abs-1301-3781} is an extension of the BOW by
 changing the dimensionality of each of the vectors it sums to an arbitrary size
-(here chosen to be 300) to house some semantic representation of each word.
-Furthermore, to ensure proper calculations, the model learns the corresponding
-mapping of these semantic representations to output classes by training a
-one-layer perceptron. Furthermore, the Deep CBOW model uses the benfit of a
-multi-layer perceptron to encode more information about a word's relationship to
-the supervising signal (for instance, sentiment). These models result in
-gradients on which an optimizer can perform gradient descent. To derive the
-gradient from these perceptrons to perform stochastic gradient descent on, the
-Pytorch library can perform automatic differentiation\cite{paszke2017automatic}.
+to house some semantic representation of each word. Furthermore, to ensure
+proper calculations, the model learns the corresponding mapping of these
+semantic representations to output classes by training a one-layer perceptron.
+Furthermore, the Deep CBOW model uses the benfit of a multi-layer perceptron to
+encode more information about a word's relationship to the supervising signal
+(for instance, sentiment). These models result in gradients on which an
+optimizer can perform gradient descent. To derive the gradient from these
+perceptrons to perform stochastic gradient descent on, the Pytorch library can
+perform automatic differentiation\cite{paszke2017automatic}.
 
-\subsubsection{RNN and LSTM}
-When parsing sentences of arbitrary lengths, and attempting some inference based
-on these sentences, Recurrent Neural Networks (RNNs) can [interpret] this
-sequential data by learning a number of weights matrices. RNNs consist of unit
-cells, which receive an input $x_t$, and the 'hidden' state $h_t$ of the
-previous unit cell on t-1. This hidden state uses both of these inputs, performs
-a linear transformation and a nonlinear transformation such as the tanh
-function, and then sends the hidden state to the next cell. Unfortunately, one of
-the major difficulties of RNNs is the exponential decay of the gradient vector
-over the length of a sentence\cite{bengio1994learning}. This is more commonly
-referred to as the vanishing gradient problem.
+\subsubsection{Long-short term network}
+Whereas the  previous models had no representation of word-order, Long-short
+term network models (LSTM) use unit cells to maintain a 'hidden state' and 'cell
+state' across temporal data, such as a sentence. Introduced in
+1997\cite{hochreiter1997long}, LSTMs are a responsive to the vanishing gradient
+problem found in Recurrent Neural Networks\cite{bengio1994learning}. This
+problem occurs when the gradient vector exponentially decays over the length of
+a sentence: this causes an effective loss in long-term memory. LSTM, maintains
+an additional cell state, $c_t$, across cells, by regulating any read or write
+operation on this cell-sate using regulating gates. The hidden state contains
+more contemporary relevant information about the data, such as active sentiment.
 
-Long-short term network (LSTM) models \cite{hochreiter1997long} were introduced
-in 1997, and added an additional cell state, $c_t$, to the core dynamics of the
-RNN. The idea of this cell-state is to counter this major problem of RNN's. An
-LSTM unit's cell state serves as long-term memory, and any operation on this
-cell state is protected by gates. Each of these gates carefully regulates
-interactions with the cell states, such as updating or receiving information.
-Via this construction of gate access, the vanishing gradient problem is
-minimized.
 \subsubsection{Tree LSTM}
 While Recurrent Neural Networks and LSTMs process previous unit cells
 sequentially, Tree LSTM cells \cite{DBLP:journals/corr/TaiSM15}
 \cite{DBLP:journals/corr/ZhuSG15} \cite{DBLP:journals/corr/LeZ15} contain
-multiple children cells from which each cell Havcan obtain past knowledge. [Tai et
-al] suggest two variants on how these child cells can be implemented: Child-Sum
-Tree LSTMs and N-Ary Trees. For a Child-sum LSTM cell, a summation of all hidden
-k hidden states is calculated. Each gate vector in this variant is calculated
-similarly to regular LSTMs, except the LSTM stores an additional weight matrix
-per gate for how to incorporate all the previous solutions, and order of
-children is not deemed important. For N-Ary trees, a unit cell additionally
-receives a previous memory cell. Instead of summing the previous hidden states
-beforehand, this variant does that in each gate with a weight matrix per
-assigned child. For instance, calculation of the input gate is altered to the
-form $i_j=\sigma(W^i*x_j + \sum\limits_{k=1}^{N}U_k^{i}h_{jl}+b^i)$. Kai et al
-state that this allows for more granular calculations, which can result in even
-more fine-tuned results. Furthermore, forget gates are calculated per child,
-which means that each child has assigned a weight matrix to each other child,
-and thus can find interaction via their parent. 
+multiple children cells from which each cell can obtain past knowledge. A paper
+by [Tai et al] suggest two variants on how these child cells can be implemented:
+Child-Sum Tree LSTMs and N-Ary Trees. For a Child-sum LSTM cell, a summation of
+all k-child hidden states is calculated. Each gate vector in this variant is
+calculated similarly to regular LSTMs, except the LSTM stores an additional
+weight matrix per gate for how to incorporate all the previous solutions, and
+order of children is not deemed important. For N-Ary trees, a unit cell
+additionally receives a previous memory cell. Instead of summing the previous
+hidden states beforehand, this variant does that in each gate with a weight
+matrix per assigned child. Kai et al state that this allows for more granular
+calculations leading to more fine-tuned results.
