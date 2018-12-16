@@ -4,18 +4,20 @@ Table \ref{table: results-acc} shows the accuracy on the testset for each model,
 averaged over three runs with different seeds. Several abbreviations
 clarification: DCBOW stands for Deep CBOW, DCBOW-PT stands for Deep CBOW with
 pretrained embedding, Mini-LSTM means vanilla LSTM trained with minibatch,
-T-LSTM stands for Tree-LSTM, and ST-LSTM is the tree LSTM trained with per-node
-supervision. \\ Table \ref{table: sign} reflects the significance of these
-predictions when compared to another model. The [conjunction] of these metrics
-makes it possible to answer a number of research questions. \\
+T-LSTM stands for Tree-LSTM, ST-LSTM is the tree LSTM trained with per-node
+supervision and CS-LSTM refers to Child-Sum LSTM. \\ Table \ref{table: sign}
+reflects the significance of these predictions when compared to another model.
+The [conjunction] of these metrics makes it possible to answer a number of
+research questions. \\
 % \begin{enumerate}
-    \vspace{-10pt}
+    \vspace{-20pt}
     \subsection{How important is word order for the task of classification of
     sentiment?} To answer this question, one only has to compare the accuracy
     results of BOW-like models and vanilla LSTM. Note that most of the BOW
     models are trained with random embedding initialization, except for
     DCBOW-PT, so it is only fair to compare DCBOW-PT with LSTM. And we can see
-    LSTM is about 3 percent over the DCBOW-PT, which is a big gap.
+    LSTM is about 3 percent over the DCBOW-PT, which is a large gap.
+    \vspace{-7pt}
     \subsection{Does tree structure improve the accuracy as opposed to
     sequential learning?} We compare the accuracy of both T-LSTM with Mini-LSTM,
     instead of vanilla LSTM, since T-LSTM is also trained in the minibatch way.
@@ -23,6 +25,7 @@ makes it possible to answer a number of research questions. \\
     of both estimations, it is not sufficient to say tree structure brings a
     performance boost. The significance test in Table \ref{table: sign} agrees
     with this view.
+    \vspace{-7pt}
     \subsection{Performance on supervising sentiment per-node?} 
     In opposite to our hypothesis, imposing supervision per-node on tree LSTM
     results in worse result in terms of mean accuracy on test set. The ST-LSTM
@@ -31,4 +34,13 @@ makes it possible to answer a number of research questions. \\
     It might result from the sparsity per batch and bad hyperparameters.
     However, we do observe less overfit in the training of ST-LSTM, suggesting
     adding per-node supervision might be a good regularizer.
+    \vspace{-7pt}
+    \subsection{How does N-ary Tree LSTM compare to the Child-Sum Tree LSTM?}
+    In opposite to our original hypothesis, the Child-Sum Tree LSTM performs
+    competitive with N-ary Tree LSTM in this task. Since each node has only two
+    children in our dataset, the order of this two children might not be as
+    useful as we previously thought. For example, when the left and right child
+    are "this movie" and "is nauseous" respectly, whichever order they are
+    composed will not change the final inference result too much. The reasons
+    can also lie in the choice of hyperparameter, especially in learning rate. 
 % \end{enumerate}
