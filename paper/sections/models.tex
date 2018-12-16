@@ -1,6 +1,24 @@
 \section{Models}
 \label{sec: models}
 
+\begin{table}[t!]
+    \begin{center}
+    \begin{tabular}{|c|l|r|l|}
+        \hline \bf Models & \bf HD & \bf LR &\bf NoP \\ \hline
+        BOW & None & 0.0005 &0\\
+        CBOW & None & 0.0005 & 1500\\
+        DCBOW(-PT)& 100 & 0.0005 &40500\\
+        LSTM&168 & 0.0003 &316680\\
+        Mini-LSTM&168 & 0.0002&316680\\
+        (S)T-LSTM&150 & 0.0002&315750\\
+        CS-LSTM&150 & 0.0002& 180750\\
+        \hline
+    \end{tabular}
+    \end{center}
+    \label{tab:parameters}
+    \caption{Hyper-parameters of each model. Where HD refers to hidden dimension, LR refers to learning rate and NoP stands for number of parameters.}
+\end{table}
+
 \begin{table*}[t]
     \centering
     \small

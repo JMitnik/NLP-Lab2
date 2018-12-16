@@ -18,13 +18,13 @@ node.
 % gist.
 
 Each model has been trained three times under different random seeds. These
-seeds are 7, 42 and 1984. Table [x] represents the number of times each model is
-trained, as well as the learning rate of the optimizer and [number of
-parameters]. Most of the model will have its embedding projector initialized
-with the pre-trained GloVe\cite{pennington2014glove} word embedding of size 300,
-without finetune. For other models we use Xavier initialization by default. Adam
-optimizer\cite{DBLP:journals/corr/KingmaB14} is used, with momentum parameters
-being $\beta_{1}=0.9$ and $\beta_{2}=0.999$ and $eps=1e-08$.
+seeds are 7, 42 and 1984. Table \ref{tab:parameters} represents the number of
+times each model is trained, as well as the learning rate of the optimizer and
+[number of parameters]. Most of the model will have its embedding projector
+initialized with the pre-trained GloVe\cite{pennington2014glove} word embedding
+of size 300, without finetune. For other models we use Xavier initialization by
+default. Adam optimizer\cite{DBLP:journals/corr/KingmaB14} is used, with
+momentum parameters being $\beta_{1}=0.9$ and $\beta_{2}=0.999$ and $eps=1e-08$.
 %  Adam is a variant on Stochastic Gradient Descent, which uses an exponential moving
 % average of the gradient and squared gradient to control decay of each parameter.
 % The loss function is the Cross Entropy Loss for each model.
