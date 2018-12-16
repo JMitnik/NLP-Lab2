@@ -5,14 +5,14 @@ Sentiment analysis is a sub-domain within the field of Natural Language
 Processing, in which an statistical model infers the direction and magnitude of
 emotions from text. Successful inference depends on building appropriate
 language models which can model the structural dependencies and semantics within
-the sentences of a language efficiently. One such structural dependency is word
-order. Another complicated aspect of inference is sufficient context when
-presented with data to predict or train on: for instance, if the model has been
-trained on partial phrases, it might become easier for the model to make wrong
-inferences based on non-negated sentiments. For this reason, it is the goal of
-this paper to investigate the role of these dependencies. The paper will
-investigate the importance of word order and context by studying a number of
-different models, each varying in how granular information is parsed.
+the sentences of a language efficiently. One such structural dependency is the
+context of a word. Context is derived from factors such as word order, or even
+the granularity of how much data the model has been trained on. Insufficient
+context might lead to not noticing negations, for instances. For this reason, it
+is the goal of this paper to investigate the role of representations of context,
+The paper will investigate the importance of word order and data granularity by
+studying a number of different models, each varying in how granular information
+is parsed.
 % To Jonathan: Is the last obstacle to 
 % yes, did we do an investigation on this phenomenon in this paper?
 
@@ -54,12 +54,13 @@ different models, each varying in how granular information is parsed.
 
     \textit{5. How does N-ary Tree LSTM compare to the Child-Sum Tree LSTM?}
     The N-ary tree-LSTM differs with Child-sum tree-LSTM in that the latter is
-    [agnostic of the order of the child nodes. On implementation details, the
-    N-ary tree-LSTM has different gate parameter for each child, while Child-sum
-    use the same parameter for all the gate including forget gate. In most
-    cases, N-ary tree-LSTM first project then sum, while the Child-sum tree-LSTM
-    do the opposite. Hence they are suitable for different tasks: the N-ary
-    tree-LSTM is suitable to those trees where child nodes are ordered, and the
-    Child-sum tree-LSTM should work well on the order of child nodes does not
-    contribute to the context. In the sentiment classification task, we need
-    N-ary tree-LSTM since the word order is important to context extraction.
+    agnostic on the order of the child nodes. On implementation details, the
+    N-ary tree-LSTM has different gate parameters for each child, while
+    Child-sum use the same parameter for all the gate including forget gate. In
+    most cases, N-ary tree-LSTM first project then sum, while the Child-sum
+    tree-LSTM do the opposite. Hence they are suitable for different tasks: the
+    N-ary tree-LSTM is suitable to those trees where child nodes are ordered,
+    and the Child-sum tree-LSTM should work well on the order of child nodes
+    does not contribute to the context. In the sentiment classification task, we
+    need N-ary tree-LSTM since the word order is important to context
+    extraction.

@@ -8,17 +8,16 @@ from very negative to very positive. D is 5 in this paper. For each word, an
 index of D represents the likelihoods $p(label|word)$ for each label based on
 word-count in training, and after summing these likelihood vectors for each
 word, the label with the highest likelihood is the eventual prediction. The CBOW
-sums vectors of a dimension 300, which is an arbitrary size to represent some
-semantical learnable properties of a word. The CBOW uses a perceptron by
-performing an affine transformation to the D-dimensional output, which
-corresponds to the output label. Deep CBOW is an extension to this technique,
-and converts the single-layer perceptron to a multi-layer perceptron. The model
-performs a linear transformation of the input ($R^{300}$) to a hidden layer
-size, which is in $R^{100}$. An activation function using the hyperbolic tangent
-(tanh) ensures non-linearity. After another linear transformation to the same
-$R^{100}$ and another tanh, the model maps these results to $R^D$. In this
-paper, DCBOW is both trained with a newly initialized word-embedding, and a
-pretrained word embedding (DCBOW-PT).
+sums vectors of a dimension 300. The CBOW uses a perceptron by performing an
+affine transformation to the D-dimensional output, which corresponds to the
+output label. Deep CBOW is an extension to this technique, and converts the
+single-layer perceptron to a multi-layer perceptron. The model performs a linear
+transformation of the input ($R^{300}$) to a hidden layer size, which is in
+$R^{100}$. An activation function using the hyperbolic tangent (tanh) ensures
+non-linearity. After another linear transformation to the same $R^{100}$ and
+another tanh, the model maps these results to $R^D$. In this paper, DCBOW is
+both trained with a newly initialized word-embedding, and a pretrained word
+embedding (DCBOW-PT).
 \vspace{-5pt}
 \subsubsection{LSTM and Tree LSTM}
 Tree LSTM is a generalization of vanilla LSTM on series with tree structure, and
@@ -86,8 +85,8 @@ perform classification.
         \hline
     \end{tabular}
     \end{center}
-    \label{tab:parameters}
     \caption{Hyper-parameters of each model. Where HD refers to hidden dimension, LR refers to learning rate and NoP stands for number of parameters.}
+    \label{tab:parameters}
 \end{table}
 
 \begin{table*}[t]
@@ -96,9 +95,9 @@ perform classification.
     \begin{tabular}{lllllllll}
     BOW  & CBOW & DCBOW & DCBOW-PT & LSTM & Mini-LSTM & T-LSTM & ST-LSTM &CS-LSTM \\
     19$\pm$ 4 & 28$\pm$ 7 & 25$\pm$ 2 & 44$\pm$ 1 & \textbf{47$\pm$ 1} & 46$\pm$ 0.4 & \textbf{47$\pm$ 1} & 45$\pm$ 1& \textbf{47$\pm$ 0.4}
-    \end{tabular}
-    \label{table: results-acc}
-    \caption{The mean and variance of test-set accuracies of three runs over 3 seeds(shown in percent)}.
+\end{tabular}
+\caption{The mean and variance of test-set accuracies of three runs over 3 seeds(shown in percent)}.
+\label{table: results-acc}
 \end{table*}
 
 
@@ -115,6 +114,6 @@ perform classification.
         T-LSTM    & 5.3-7  & 2.0E-6 & 4.0E-5 &  0.015  & 0.07  &   0.48   &    -    &   0.24    &0.9 \\
         ST-LSTM & 8.3-19  &  3.3-10  &  8.8-9  & 3.6E-4 & 4.0E-3 &  0.057   &    0.24   &   -     & 0.2  
         \end{tabular}
-    \label{table: sign}
-    \caption{Significance of sign test across all models pairs.}
+        \caption{Significance of sign test across all models pairs.}
+        \label{table: sign}
 \end{table*}
