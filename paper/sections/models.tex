@@ -1,5 +1,7 @@
+\vspace{-5pt}
 \section{Models}
 \label{sec: models}
+\vspace{-5pt}
 \subsection{BOW, CBOW and Deep CBOW}
 The BOW sums vectors of size $R^{D}$, where D is the number of sentiment labels,
 from very negative to very positive. D is 5 in this paper. For each word, an
@@ -17,34 +19,44 @@ size, which is in $R^{100}$. An activation function using the hyperbolic tangent
 $R^{100}$ and another tanh, the model maps these results to $R^D$. In this
 paper, DCBOW is both trained with a newly initialized word-embedding, and a
 pretrained word embedding (DCBOW-PT).
+\vspace{-5pt}
 \subsubsection{LSTM and Tree LSTM}
-The LSTM and N-Ary Tree LSTM Architecture are similar in that their calculations
-mostly consist of the same steps, and the comparison can be made that LSTM is a
-Tree LSTM with one child-node for each node. Each gate within a cell consists of
-their own unique weight, $U$ and $W$, which correspond respectively to the
-weights in relation to a child k, and in relation to the input $x$. Each gate
-also encompasses a bias, $b$. Each gate follows a similar affine transformation
-of the prior hidden state and input. These can be found in
-\cite{tai2015improved}, 8-14, and correspond to Vanilla LSTM's formulas if
-$max_k=1$. Initially, upon receiving an input in time the forget gate $f_{jk}$
-is responsible for deciding how much, for each child k, the child's hidden state
+Tree LSTM is a generalization of vanilla LSTM on series with tree structure, and
+N-ary Tree LSTM act exact the same with vanilla LSTM when acting upon uni-tree,
+namely series with explicit causal arrows. LSTM is consists of one iterated
+cell, within the cell exist 5 gates: $f_{tk}$, $i_t$, $c_t$, $h_t$, $o_t$. Each
+gate consists of its own unique weight, $U_k$ and $W$, which correspond
+respectively to the weights in relation to the $k$th child, and in relation to
+the input $x$. Each gate also encompasses a bias, $b$. Each gate follows a
+similar affine transformation of the prior hidden state and input. By
+compositing the gates and previous states together, we can gain the states to be
+passed to the next time step. At the last time step, we take the output state
+$o_T$ as the representation of the whole sentence and pass it to a MLP to
+perform classification.
+\vspace{-8pt}
+% Initially, upon receiving an input in time the forget gate $f_{jk}$
+% is responsible for deciding how much, for each child k, the child's hidden state
 % $h_jk$, is interpreted into the parent (j)'s cell state: $f_jk =
 % \sigma(W^{(f)}x_j+\sum\limits^{N}_{l=1}U_{kl}^{(f)}*h_{jl}+b^{(f)}$. A
 % combination of the input vector,
-% $i_j=\sigma(W^{(i)}x_j+\sum\limits^{N}_{l=1}U_{l}^{(i)}*h_{jl}+b^{(i))$ and
+% $i_j=\sigma(W^{(i)}x_j+\sum\limits^{N}_{l=1}U_{l}^{(i)}*h_{jl}+b^{i}$ and
 % candidate selection, can be used to change the value of the unit's cell
 % state. Each of the children's cell states with a product conjunction with the
 % current unit's forget gate, are combined and result into
+% These can be found in
+% \cite{tai2015improved}, 8-14, and correspond to Vanilla LSTM's formulas if
+% $max_k=1$.
 
 
-For Tree SLTM by performing the calculation $f_t = \sigma(W_f * [h_{t-1}, x_t]
-+ b_f)$. Next, the input gate decides how much of each value of the cell state
-to update, $i_t = \sigma(W_i * [h_{t-1}, x_t] + b_i)$. An intermediate step
-calculates the actual candidate selection of the input, by $C_t = tanh(W_c *
-[h_{t-1}, x_t] + b_c)$. These two can then be implemented to change the value of
-the cell state. The cell state is then finally accessed by an output gate, $o_t
-= \sigma(W_o * [h_{t-1}, x_t] + b_o)$, and multiplied by the tanh of the
-candidates, to calculate the new hidden state. 
+
+% For Tree LSTM by performing the calculation $f_t = \sigma(W_f * [h_{t-1}, x_t]
+% + b_f)$. Next, the input gate decides how much of each value of the cell state
+% to update, $i_t = \sigma(W_i * [h_{t-1}, x_t] + b_i)$. An intermediate step
+% calculates the actual candidate selection of the input, by $C_t = tanh(W_c *
+% [h_{t-1}, x_t] + b_c)$. These two can then be implemented to change the value of
+% the cell state. The cell state is then finally accessed by an output gate, $o_t
+% = \sigma(W_o * [h_{t-1}, x_t] + b_o)$, and multiplied by the tanh of the
+% candidates, to calculate the new hidden state.
 
 
 
