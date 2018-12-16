@@ -28,21 +28,13 @@ of the prior hidden state and input. These can be found in
 \cite{tai2015improved}, 8-14, and correspond to Vanilla LSTM's formulas if
 $max_k=1$. Initially, upon receiving an input in time the forget gate $f_{jk}$
 is responsible for deciding how much, for each child k, the child's hidden state
-$h_jk$, is interpreted into the parent (j)'s cell state: $f_jk =
-\sigma(W^{(f)}x_j+\sum\limits^{N}_{l=1}U_{kl}^{(f)}*h_{jl}+b^{(f)}$. A
-combination of the input vector,
-$i_j=\sigma(W^{(i)}x_j+\sum\limits^{N}_{l=1}U_{l}^{(i)}*h_{jl}+b^{(i))$ and
-candidate selection, can be used to change the value of the unit's cell
-state. Each of the children's cell states with a product conjunction with the
-current unit's forget gate, are combined and result into
-
-
-
-
-
-
-
-
+% $h_jk$, is interpreted into the parent (j)'s cell state: $f_jk =
+% \sigma(W^{(f)}x_j+\sum\limits^{N}_{l=1}U_{kl}^{(f)}*h_{jl}+b^{(f)}$. A
+% combination of the input vector,
+% $i_j=\sigma(W^{(i)}x_j+\sum\limits^{N}_{l=1}U_{l}^{(i)}*h_{jl}+b^{(i))$ and
+% candidate selection, can be used to change the value of the unit's cell
+% state. Each of the children's cell states with a product conjunction with the
+% current unit's forget gate, are combined and result into
 
 
 For Tree SLTM by performing the calculation $f_t = \sigma(W_f * [h_{t-1}, x_t]

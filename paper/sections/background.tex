@@ -1,5 +1,6 @@
 \section{Background}
 \label{sec: background}
+
 \subsubsection{Word Embeddings}
 Word embedding is a fundamental technique to represent words in an efficient
 way. The basic idea is to cast all words in the vocabulary to a low dimensional
@@ -11,60 +12,31 @@ one word is related to the neighbor word distribution. A similar approach that
 captures the distribution by count the co-occurrence globally called
 GloVe\cite{pennington2014glove} is used in this paper.
 
-
-\subsubsection{CBOW and Deep CBOW}
-One simple language model used in the literature is the Bag of Words model,
-which uses
-
-% Include source for perceptron
+\subsubsection{BOW, CBOW and Deep CBOW}
 The bag of words (BOW) model uses maximum likelihood to predict the most likely
-sentiment class by summing vectors of size $R^{D}$, . The BOW bases its
-likelihoods on the count of each word, [class-likelihoods, $p(label|word)$].
-After summation, the label with the maximum likelihood is taken as the
-prediction. The simplicity of the algorithm has as consequence that no
-word-order is being memorized, and thus loses the predictive meaning of the
-context this implies.
-
-% Add somewhere
-
-This perceptron,
-and any following Mutli-Layer Perceptrons are built using PyTorch, which is able
-to perform automatic differentiation\cite{paszke2017automatic} to calculate the
-gradients which the perceptron can use.
-
-
-% Add somewhere end
-
-\begin{align*}
-    \hat{y} = \operatorname*{arg\,max}_{label} \sum^{N}_{i=0} log p(label|i)
-\end{align*}
-
-The Continuous bag of word (CBOW) model is an extension of the BOW by changing
-the dimensionality of each of the vectors it sums to an arbitrary size (here
-chosen to be 300) to house some semantic representation of each word.
+sentiment class. This language model has no representation of word-order and
+thus has been considered a simple but not sufficient representation to
+effectively capture word-order. The Continuous bag of word (CBOW)
+model\cite{DBLP:journals/corr/abs-1301-3781} is an extension of the BOW by
+changing the dimensionality of each of the vectors it sums to an arbitrary size
+(here chosen to be 300) to house some semantic representation of each word.
 Furthermore, to ensure proper calculations, the model learns the corresponding
-mapping of these semantic representations to output classes by training a neural
-network and learning a weight matrix, $W$. The model concludes by performing an
-affine transformation from $R^{300}$ to $R^D$.
-
-The Deep CBOW is a deeper extension on the CBOW matrix and uses the benefit of
-multiple layers within its neural network's output to learn more information on
-these semantic representations during the forward pass of the neural network.
-Essentially,  similarly to how CBOW did this. 
-
-% TODO: Does this fit here, or in models, or something?
-% TODO: Decide if we need some source for this one?
-% TODO: Add citation
+mapping of these semantic representations to output classes by training a
+one-layer perceptron. Furthermore, the Deep CBOW model uses the benfit of a
+multi-layer perceptron to encode more information about a word's relationship to
+the supervising signal (for instance, sentiment). These models result in
+gradients on which an optimizer can perform gradient descent. To derive the
+gradient from these perceptrons to perform stochastic gradient descent on, the
+Pytorch library can perform automatic differentiation\cite{paszke2017automatic}.
 
 \subsubsection{RNN and LSTM}
-RNN
 When parsing sentences of arbitrary lengths, and attempting some inference based
 on these sentences, Recurrent Neural Networks (RNNs) can [interpret] this
 sequential data by learning a number of weights matrices. RNNs consist of unit
 cells, which receive an input $x_t$, and the 'hidden' state $h_t$ of the
 previous unit cell on t-1. This hidden state uses both of these inputs, performs
 a linear transformation and a nonlinear transformation such as the tanh
-function, and then send the hidden state to the next cell. Unfortunately, one of
+function, and then sends the hidden state to the next cell. Unfortunately, one of
 the major difficulties of RNNs is the exponential decay of the gradient vector
 over the length of a sentence\cite{bengio1994learning}. This is more commonly
 referred to as the vanishing gradient problem.
