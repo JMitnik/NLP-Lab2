@@ -11,21 +11,21 @@ GloVe\cite{pennington2014glove}, all based on estimating the neighbor words
 distribution. We use GloVe in this paper.
  
 \subsubsection{BOW, CBOW and Deep CBOW}
-The bag of words (BOW) model uses maximum likelihood to predict the most likely
+The bag of words (BOW) model uses word-count to predict the most likely
 sentiment class. This language model has no representation of word-order and
 thus has been considered a simple but not sufficient representation to
 effectively capture word-order. The Continuous bag of word (CBOW)
 model\cite{DBLP:journals/corr/abs-1301-3781} is an extension of the BOW by
-changing the dimensionality of each of the vectors it sums to an arbitrary size
-to house some semantic representation of each word. Furthermore, to ensure
-proper calculations, the model learns the corresponding mapping of these
-semantic representations to output classes by training a one-layer perceptron.
-Furthermore, the Deep CBOW model uses the benfit of a multi-layer perceptron to
-encode more information about a word's relationship to the supervising signal
-(for instance, sentiment). These models result in gradients on which an
-optimizer can perform gradient descent. To derive the gradient from these
-perceptrons to perform stochastic gradient descent on, the Pytorch library can
-perform automatic differentiation\cite{paszke2017automatic}.
+changing the dimensionality of each of its embeddings to an arbitrary size to
+house some semantic representation for each word. Furthermore, to ensure proper
+calculations, the model learns the corresponding mapping of these semantic
+representations to output classes by training a one-layer perceptron. The Deep
+CBOW model uses the benfit of a multi-layer perceptron to encode more
+information about a word's relationship to the supervising signal (for instance,
+sentiment). These models result in gradients on which an optimizer can perform
+gradient descent. To derive the gradient from these perceptrons to perform
+stochastic gradient descent on, the Pytorch library can perform automatic
+differentiation\cite{paszke2017automatic}.
 
 \subsubsection{Long-short term network}
 Whereas the  previous models had no representation of word-order, Long-short
