@@ -3,7 +3,7 @@
 Through the designed experiments, we found:
 \begin{enumerate}
     \vspace{-5pt}
-    \item The word order context is important, but not very important if you
+    \item The word order context is important, but not bring a huge boost if you
     have a proper pretrained embedding.
     \vspace{-7pt}
     \item Minibatch training may slightly reduce the performance on the test
@@ -13,7 +13,7 @@ Through the designed experiments, we found:
     opposed to expectations.
     \vspace{-7pt}
     \item Tree-LSTM does not explicitly capture more context than vanilla LSTM
-    even with longer sentences.
+    even with longer sentences at least in this parameter setting.
 \end{enumerate}
 The original work\cite{tai2015improved} has better results on Tree LSTM, so some
 arguments above may not hold in their contexts. Hence we suggest for future
